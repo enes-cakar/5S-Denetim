@@ -2,946 +2,415 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>5S Denetim</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>5S Denetim v3</title>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --blue: #0052A3;
-  --blue-dark: #003d7a;
-  --blue-light: #E6F1FB;
-  --blue-mid: #378ADD;
-  --green: #1D6A3A;
-  --green-light: #E6F5EC;
-  --red: #C0392B;
-  --red-light: #FDECEA;
-  --amber: #B45309;
-  --amber-light: #FEF3C7;
-  --gray: #F5F6F8;
-  --gray-mid: #E2E5EA;
-  --gray-dark: #6B7280;
-  --text: #111827;
-  --text-soft: #6B7280;
-  --white: #FFFFFF;
-  --radius: 14px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: #EAECF0;
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 20px 0 40px;
-}
-
-.phone {
-  width: 100%;
-  max-width: 420px;
-  background: var(--white);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.15);
-  min-height: 700px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* SCREENS */
-.screen { display: none; flex-direction: column; flex: 1; }
-.screen.active { display: flex; }
-
-/* TOPBAR */
-.topbar {
-  background: var(--blue);
-  padding: 16px 18px 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-.topbar-back {
-  width: 32px; height: 32px;
-  border: none; background: rgba(255,255,255,0.15);
-  border-radius: 8px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.topbar-back svg { width: 16px; height: 16px; }
-.topbar-info { flex: 1; min-width: 0; }
-.topbar-title { font-size: 15px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.topbar-sub { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 1px; }
-.topbar-badge {
-  background: rgba(255,255,255,0.2);
-  color: #fff; font-size: 11px; font-weight: 500;
-  padding: 3px 8px; border-radius: 99px; flex-shrink: 0;
-  font-family: 'DM Mono', monospace;
-}
-
-/* BODY */
-.body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
-
-/* CARD */
-.card {
-  background: var(--white);
-  border: 1px solid var(--gray-mid);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  box-shadow: var(--shadow);
-}
-.card-label {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.8px;
-  text-transform: uppercase; color: var(--blue);
-  margin-bottom: 10px;
-}
-
-/* SCREEN 1 — QR */
-.qr-hero {
-  background: var(--blue-light);
-  border-radius: var(--radius);
-  padding: 28px 20px;
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
-  border: 1px solid #C5DDF6;
-}
-.qr-frame {
-  width: 110px; height: 110px;
-  border: 3px solid var(--blue);
-  border-radius: 16px;
-  position: relative;
-  display: flex; align-items: center; justify-content: center;
-}
-.qr-frame::before, .qr-frame::after {
-  content: '';
-  position: absolute;
-  width: 20px; height: 20px;
-  border-color: var(--blue-mid);
-  border-style: solid;
-}
-.qr-frame::before { top: -3px; left: -3px; border-width: 4px 0 0 4px; border-radius: 4px 0 0 0; }
-.qr-frame::after { bottom: -3px; right: -3px; border-width: 0 4px 4px 0; border-radius: 0 0 4px 0; }
-.qr-inner {
-  display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; padding: 8px;
-}
-.qr-inner span { width: 12px; height: 12px; border-radius: 2px; background: var(--blue); }
-.qr-inner span:nth-child(3), .qr-inner span:nth-child(7), .qr-inner span:nth-child(13) { background: transparent; }
-.qr-inner span:nth-child(even) { opacity: 0.4; }
-.qr-hint { font-size: 13px; color: var(--text-soft); text-align: center; line-height: 1.5; }
-
-/* DENETÇI INPUT */
-.denetci-row { display: flex; gap: 8px; align-items: center; }
-.denetci-row input { flex: 1; font-size: 13px; font-family: 'DM Sans', sans-serif; }
-
-/* ALAN SEÇİM */
-.alan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.alan-btn {
-  background: var(--gray);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 500;
-  color: var(--text);
-  cursor: pointer; text-align: left;
-  transition: all 0.15s;
-}
-.alan-btn:hover { border-color: var(--blue); background: var(--blue-light); }
-.alan-btn.selected { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
-.alan-btn .alan-id { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--text-soft); margin-bottom: 2px; }
-
-/* PLATFORM SEÇİM */
-.platform-list { display: flex; flex-direction: column; gap: 6px; }
-.platform-btn {
-  background: var(--gray);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px; font-weight: 500;
-  color: var(--text);
-  cursor: pointer; text-align: left;
-  display: flex; justify-content: space-between; align-items: center;
-  transition: all 0.15s;
-}
-.platform-btn:hover { border-color: var(--blue); background: var(--blue-light); }
-.platform-btn.selected { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
-.platform-btn .pid { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-soft); }
-
-/* SCREEN 2 — DENETİM FORMU */
-.progress-wrap { margin-bottom: 4px; }
-.progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.progress-label { font-size: 12px; color: var(--text-soft); }
-.progress-count { font-size: 12px; font-weight: 600; color: var(--blue); font-family: 'DM Mono', monospace; }
-.progress-bar { background: var(--gray-mid); border-radius: 99px; height: 5px; }
-.progress-fill { background: var(--blue); height: 100%; border-radius: 99px; transition: width 0.4s ease; }
-
-.kategori-header {
-  background: var(--blue);
-  color: #fff;
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
-  text-transform: uppercase;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.kategori-header .kat-score { font-family: 'DM Mono', monospace; font-size: 12px; opacity: 0.8; }
-
-.soru-card {
-  background: var(--white);
-  border: 1px solid var(--gray-mid);
-  border-radius: var(--radius);
-  padding: 14px;
-  transition: border-color 0.2s;
-}
-.soru-card.answered-evet { border-color: #86EFAC; background: #F0FDF4; }
-.soru-card.answered-hayir { border-color: #FCA5A5; background: #FFF5F5; }
-.soru-card.answered-na { border-color: #D1D5DB; background: #F9FAFB; }
-
-.soru-meta { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
-.soru-no {
-  font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace;
-  background: var(--blue-light); color: var(--blue);
-  padding: 2px 7px; border-radius: 99px;
-}
-.kritik-badge {
-  font-size: 10px; font-weight: 600;
-  background: var(--red-light); color: var(--red);
-  padding: 2px 7px; border-radius: 99px;
-}
-.soru-text { font-size: 13px; color: var(--text); line-height: 1.55; margin-bottom: 12px; white-space: pre-line; }
-.cevap-row { display: flex; gap: 6px; }
-.cevap-btn {
-  flex: 1; padding: 9px 6px;
-  border-radius: 8px; font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 600;
-  border: 1.5px solid var(--gray-mid);
-  background: var(--gray); color: var(--text-soft);
-  cursor: pointer; text-align: center; transition: all 0.15s;
-}
-.cevap-btn:hover { transform: translateY(-1px); }
-.cevap-btn.active-evet { border-color: var(--green); background: var(--green-light); color: var(--green); }
-.cevap-btn.active-hayir { border-color: var(--red); background: var(--red-light); color: var(--red); }
-.cevap-btn.active-na { border-color: #9CA3AF; background: #F3F4F6; color: #374151; }
-
-.foto-mini {
-  margin-top: 10px;
-  background: var(--red-light);
-  border: 1px dashed #FCA5A5;
-  border-radius: 8px;
-  padding: 8px 12px;
-  display: flex; align-items: center; gap: 8px;
-  cursor: pointer;
-}
-.foto-mini svg { width: 16px; height: 16px; flex-shrink: 0; }
-.foto-mini span { font-size: 12px; color: var(--red); }
-.foto-mini .foto-done { color: var(--green); font-size: 11px; font-weight: 600; }
-
-/* NOT ALANI */
-.not-area {
-  margin-top: 8px;
-  background: var(--amber-light);
-  border: 1px solid #FDE68A;
-  border-radius: 8px;
-  padding: 8px 10px;
-}
-.not-area textarea {
-  width: 100%; background: none; border: none;
-  font-family: 'DM Sans', sans-serif; font-size: 12px;
-  color: var(--text); resize: none; outline: none;
-  min-height: 40px;
-}
-
-/* SCREEN 3 — FOTOĞRAF */
-.foto-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--red-light); }
-.foto-header svg { width: 20px; height: 20px; color: var(--red); }
-.foto-soru { font-size: 13px; color: var(--text); line-height: 1.5; font-weight: 500; }
-
-.foto-upload-area {
-  border: 2px dashed #FCA5A5;
-  border-radius: var(--radius);
-  padding: 32px 20px;
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  background: #FFF5F5; cursor: pointer; transition: all 0.2s;
-}
-.foto-upload-area:hover { border-color: var(--red); background: var(--red-light); }
-.foto-upload-icon {
-  width: 48px; height: 48px;
-  background: var(--red-light); border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid #FCA5A5;
-}
-.foto-upload-icon svg { width: 22px; height: 22px; }
-.foto-upload-label { font-size: 14px; font-weight: 600; color: var(--red); }
-.foto-upload-hint { font-size: 12px; color: var(--text-soft); text-align: center; }
-.foto-preview {
-  width: 100%; background: #F0FDF4;
-  border: 2px solid #86EFAC;
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  display: flex; align-items: center; gap: 12px;
-}
-.foto-check { width: 32px; height: 32px; background: var(--green-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-/* SCREEN 4 — ÖZET */
-.score-hero {
-  background: var(--blue);
-  border-radius: var(--radius);
-  padding: 24px 20px;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-}
-.score-num { font-size: 52px; font-weight: 600; color: #fff; font-family: 'DM Mono', monospace; line-height: 1; }
-.score-label { font-size: 13px; color: rgba(255,255,255,0.7); }
-.score-badges { display: flex; gap: 8px; margin-top: 8px; }
-.score-badge {
-  background: rgba(255,255,255,0.15);
-  color: #fff; font-size: 12px; font-weight: 600;
-  padding: 4px 12px; border-radius: 99px;
-}
-.score-badge.red { background: rgba(239,68,68,0.3); }
-.kat-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 0; border-bottom: 1px solid var(--gray-mid);
-}
-.kat-row:last-child { border-bottom: none; }
-.kat-name { font-size: 13px; color: var(--text); flex: 1; }
-.kat-bar { flex: 2; background: var(--gray-mid); border-radius: 99px; height: 6px; }
-.kat-bar-fill { height: 100%; border-radius: 99px; }
-.kat-pct { font-size: 12px; font-weight: 600; font-family: 'DM Mono', monospace; min-width: 36px; text-align: right; }
-
-/* HAYIR LİSTESİ */
-.hayir-item {
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  background: var(--red-light);
-  border: 1px solid #FCA5A5;
-  margin-bottom: 6px;
-}
-.hayir-item:last-child { margin-bottom: 0; }
-.hayir-item-no { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--red); margin-bottom: 3px; }
-.hayir-item-text { font-size: 12px; color: var(--text); line-height: 1.45; }
-.hayir-item-foto { font-size: 11px; color: var(--green); font-weight: 600; margin-top: 4px; }
-
-/* BUTTONS */
-.btn {
-  width: 100%; padding: 14px;
-  border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px; font-weight: 600;
-  cursor: pointer; border: none;
-  transition: all 0.15s;
-}
-.btn-primary { background: var(--blue); color: #fff; }
-.btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
-.btn-primary:active { transform: scale(0.98); }
-.btn-secondary { background: var(--gray); color: var(--text); border: 1px solid var(--gray-mid); }
-.btn-danger { background: var(--red); color: #fff; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-/* DIVIDER */
-.divider { height: 1px; background: var(--gray-mid); margin: 4px 0; }
-
-/* INFO ROW */
-.info-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; }
-.info-row + .info-row { border-top: 1px solid var(--gray-mid); }
-.info-key { font-size: 12px; color: var(--text-soft); }
-.info-val { font-size: 12px; font-weight: 600; color: var(--text); }
-
-/* TOAST */
-.toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px);
-  background: #1F2937; color: #fff; font-size: 13px; font-weight: 500;
-  padding: 10px 18px; border-radius: 99px;
-  transition: transform 0.3s ease; z-index: 100; white-space: nowrap;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-
-input, textarea, select {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px; color: var(--text);
-  background: var(--gray);
-  border: 1px solid var(--gray-mid);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px; width: 100%;
-  outline: none; transition: border-color 0.15s;
-}
-input:focus, textarea:focus { border-color: var(--blue); background: #fff; }
+:root{--blue:#0052A3;--blue-dark:#003d7a;--blue-light:#E6F1FB;--green:#1D6A3A;--green-light:#E6F5EC;--red:#C0392B;--red-light:#FDECEA;--amber:#B45309;--gray:#F5F6F8;--gray-mid:#E2E5EA;--text:#111827;--text-soft:#6B7280;--white:#FFFFFF;--r:14px;--rs:8px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"DM Sans",sans-serif;background:#EAECF0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px 0 40px}
+.app{width:100%;max-width:420px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.15);min-height:700px;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;flex:1}.screen.active{display:flex}
+.topbar{background:var(--blue);padding:16px 18px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.bk{width:32px;height:32px;border:none;background:rgba(255,255,255,.15);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ti{flex:1;min-width:0}.tt{font-size:15px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ts{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.tbadge{background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:99px;flex-shrink:0;font-family:"DM Mono",monospace}
+.body{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.card{background:#fff;border:1px solid var(--gray-mid);border-radius:var(--r);padding:14px 16px}
+.cl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+input,textarea,select{font-family:"DM Sans",sans-serif;font-size:13px;color:var(--text);background:var(--gray);border:1px solid var(--gray-mid);border-radius:var(--rs);padding:10px 12px;width:100%;outline:none;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--blue);background:#fff}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.btn{width:100%;padding:14px;border-radius:var(--rs);font-family:"DM Sans",sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.bp{background:var(--blue);color:#fff}.bp:hover{background:var(--blue-dark)}.bp:active{transform:scale(.98)}.bp:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.bs{background:var(--gray);color:var(--text);border:1px solid var(--gray-mid)}
+.bsu{background:var(--green);color:#fff}
+.bd{background:var(--red);color:#fff}
+.qr-hero{background:var(--blue-light);border-radius:var(--r);padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:14px;border:1px solid #C5DDF6}
+.qvw{position:relative;width:240px;height:240px;border-radius:16px;overflow:hidden;background:#000;flex-shrink:0}
+.qvw video{width:100%;height:100%;object-fit:cover}
+.qc{position:absolute;width:24px;height:24px;border-color:#378ADD;border-style:solid}
+.qc.tl{top:8px;left:8px;border-width:3px 0 0 3px;border-radius:3px 0 0 0}
+.qc.tr{top:8px;right:8px;border-width:3px 3px 0 0;border-radius:0 3px 0 0}
+.qc.bl{bottom:8px;left:8px;border-width:0 0 3px 3px;border-radius:0 0 0 3px}
+.qc.br{bottom:8px;right:8px;border-width:0 3px 3px 0;border-radius:0 0 3px 0}
+.sl{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#378ADD,transparent);animation:sc 2s linear infinite}
+@keyframes sc{0%{top:8%}100%{top:92%}}
+.qhint{font-size:13px;color:var(--text-soft);text-align:center;line-height:1.5}
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ab{background:var(--gray);border:1.5px solid var(--gray-mid);border-radius:var(--rs);padding:10px 12px;font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;text-align:left;transition:all .15s}
+.ab:hover{border-color:var(--blue);background:var(--blue-light)}.ab.sel{border-color:var(--blue);background:var(--blue-light);color:var(--blue)}
+.aid{font-size:10px;font-family:"DM Mono",monospace;color:var(--text-soft);margin-bottom:2px}
+.pb{background:var(--gray-mid);border-radius:99px;height:5px}.pf{background:var(--blue);height:100%;border-radius:99px;transition:width .4s}
+.kh{border-radius:var(--rs);padding:8px 12px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;display:flex;justify-content:space-between;color:#fff}
+.sc{background:#fff;border:1px solid var(--gray-mid);border-radius:var(--r);padding:14px;transition:border-color .2s,background .2s}
+.sc.ae{border-color:#86EFAC;background:#F0FDF4}.sc.ah{border-color:#FCA5A5;background:#FFF5F5}.sc.an{border-color:#D1D5DB;background:#F9FAFB}
+.sm{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.sn{font-size:10px;font-weight:600;font-family:"DM Mono",monospace;background:var(--blue-light);color:var(--blue);padding:2px 7px;border-radius:99px}
+.kb{font-size:10px;font-weight:600;background:var(--red-light);color:var(--red);padding:2px 7px;border-radius:99px}
+.st{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:12px;white-space:pre-line}
+.cr{display:flex;gap:6px}
+.cb{flex:1;padding:9px 4px;border-radius:8px;font-family:"DM Sans",sans-serif;font-size:12px;font-weight:600;border:1.5px solid var(--gray-mid);background:var(--gray);color:var(--text-soft);cursor:pointer;text-align:center;transition:all .15s}
+.cb.ce{border-color:#1D6A3A;background:#E6F5EC;color:#1D6A3A}
+.cb.ch{border-color:var(--red);background:var(--red-light);color:var(--red)}
+.cb.cn{border-color:#9CA3AF;background:#F3F4F6;color:#374151}
+.fp{margin-top:10px;border:1.5px dashed #FCA5A5;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--red-light)}
+.fc-btn{background:var(--red);color:#fff;border:none;border-radius:var(--r);padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;width:100%}
+.fg-btn{background:var(--gray);color:var(--text);border:1px solid var(--gray-mid);border-radius:var(--r);padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;width:100%;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:500}
+.sh{border-radius:var(--r);padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sn2{font-size:52px;font-weight:600;color:#fff;font-family:"DM Mono",monospace;line-height:1}
+.sl2{font-size:13px;color:rgba(255,255,255,.7)}
+.sbd{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+.sbg{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:99px}
+.sbg.r{background:rgba(239,68,68,.35)}
+.kr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray-mid)}.kr:last-child{border-bottom:none}
+.kn{font-size:13px;color:var(--text);flex:1}
+.kbar{flex:2;background:var(--gray-mid);border-radius:99px;height:6px}
+.kbf{height:100%;border-radius:99px}
+.kp{font-size:12px;font-weight:600;font-family:"DM Mono",monospace;min-width:36px;text-align:right}
+.hi{padding:10px 14px;border-radius:var(--rs);background:var(--red-light);border:1px solid #FCA5A5;margin-bottom:6px}
+.hi:last-child{margin-bottom:0}
+.ir{display:flex;justify-content:space-between;align-items:center;padding:7px 0}.ir+.ir{border-top:1px solid var(--gray-mid)}
+.ik{font-size:12px;color:var(--text-soft)}.iv{font-size:12px;font-weight:600;color:var(--text)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:99px;transition:transform .3s;z-index:999;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
 <body>
+<div class="app">
 
-<div class="phone">
-
-<!-- SCREEN 1: GİRİŞ -->
 <div class="screen active" id="s1">
   <div class="topbar">
-    <div class="topbar-info">
-      <div class="topbar-title">5S Denetim Sistemi</div>
-      <div class="topbar-sub">Arvato · Lean Yönetimi & Operasyon Standardizasyonu</div>
-    </div>
+    <div class="ti"><div class="tt">5S Denetim Sistemi</div><div class="ts">Arvato &middot; Lean Y&ouml;netimi &amp; Operasyon Standardizasyonu</div></div>
   </div>
   <div class="body">
-    <div class="qr-hero" id="qrHero">
-      <div id="qr-scanner-wrap" style="width:100%;display:none;flex-direction:column;align-items:center;gap:12px">
-        <div style="position:relative;width:220px;height:220px;border-radius:16px;overflow:hidden;background:#000;flex-shrink:0">
-          <video id="qr-video" style="width:100%;height:100%;object-fit:cover" playsinline></video>
-          <div style="position:absolute;top:10px;left:10px;width:24px;height:24px;border-top:3px solid #378ADD;border-left:3px solid #378ADD;border-radius:3px 0 0 0"></div>
-          <div style="position:absolute;top:10px;right:10px;width:24px;height:24px;border-top:3px solid #378ADD;border-right:3px solid #378ADD;border-radius:0 3px 0 0"></div>
-          <div style="position:absolute;bottom:10px;left:10px;width:24px;height:24px;border-bottom:3px solid #378ADD;border-left:3px solid #378ADD;border-radius:0 0 0 3px"></div>
-          <div style="position:absolute;bottom:10px;right:10px;width:24px;height:24px;border-bottom:3px solid #378ADD;border-right:3px solid #378ADD;border-radius:0 0 3px 0"></div>
-          <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#378ADD,transparent);animation:scanline 2s linear infinite"></div>
-        </div>
-        <div class="qr-hint">Kamerayı QR koda doğrultun</div>
-        <button class="btn btn-secondary" onclick="stopScanner()" style="width:auto;padding:8px 20px;font-size:13px">Kamerayı kapat</button>
+    <div class="qr-hero">
+      <div id="qrS" style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#0052A3" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1"/></svg>
+        <div class="qhint">QR kodu okutun veya<br>a&#351;a&#287;&#305;dan se&#231;in / girin</div>
+        <button class="btn bp" style="width:auto;padding:10px 28px" onclick="startQR()">Kameras&#305;n&#305; a&#231;</button>
       </div>
-      <div id="qr-static" style="display:flex;flex-direction:column;align-items:center;gap:14px">
-        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#0052A3" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1"/></svg>
-        <div class="qr-hint">Denetim alanındaki QR kodu<br>okutun veya manuel giriş yapın</div>
-        <button class="btn btn-primary" onclick="startScanner()" style="width:auto;padding:10px 24px">Kamerayı aç</button>
+      <div id="qrV" style="display:none;flex-direction:column;align-items:center;gap:12px;width:100%">
+        <div class="qvw"><video id="qrVid" playsinline autoplay muted></video><div class="qc tl"></div><div class="qc tr"></div><div class="qc bl"></div><div class="qc br"></div><div class="sl"></div></div>
+        <div class="qhint">Kameray&#305; QR koda do&#287;rultun</div>
+        <button class="btn bs" style="width:auto;padding:8px 20px;font-size:13px" onclick="stopQR()">Kapat</button>
       </div>
     </div>
-    <style>@keyframes scanline{0%{top:5%}100%{top:95%}}</style>
-
     <div class="card">
-      <div class="card-label">Manuel giriş</div>
-      <input type="text" id="qrInput" placeholder="örn: P01-A01" style="margin-bottom:8px" oninput="this.value=this.value.toUpperCase()">
-      <button class="btn btn-primary" onclick="qrGiris()">Devam et</button>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Platform seç</div>
-      <div class="platform-list" id="platformList"></div>
+      <div class="cl">Platform ve Alan Se&#231;</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <select id="pSel" style="flex:1" onchange="chkM()"><option value="">Platform...</option></select>
+        <select id="aSel" style="flex:1" onchange="chkM()"><option value="">Alan...</option></select>
+      </div>
+      <input type="text" id="qrM" placeholder="veya QR: P01-A01" oninput="this.value=this.value.toUpperCase();chkM()" style="margin-bottom:8px">
+      <button class="btn bp" id="mBtn" onclick="manuelGiris()" disabled>Devam et</button>
     </div>
   </div>
 </div>
 
-<!-- SCREEN 1b: ALAN SEÇİM -->
 <div class="screen" id="s1b">
   <div class="topbar">
-    <button class="topbar-back" onclick="goScreen('s1')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <div class="topbar-info">
-      <div class="topbar-title" id="s1b-platform-title">Platform seçin</div>
-      <div class="topbar-sub">Denetim alanı seçin</div>
-    </div>
+    <button class="bk" onclick="stopQR();goScreen('s1')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="ti"><div class="tt" id="s1bT">Platform</div><div class="ts">Alan se&#231;in</div></div>
   </div>
   <div class="body">
-    <div class="card">
-      <div class="card-label">Denetçi adı</div>
-      <input type="text" id="denetciAdi" placeholder="Adınızı girin...">
-    </div>
-    <div class="card">
-      <div class="card-label">Denetim alanı</div>
-      <div class="alan-grid" id="alanGrid"></div>
-    </div>
-    <button class="btn btn-primary" id="baslatBtn" onclick="denetimBaslat()" disabled>Denetimi başlat</button>
+    <div class="card"><div class="cl">Denet&#231;i</div><input type="text" id="dAdi" placeholder="Ad&#305;n&#305;z&#305; girin..." oninput="chkB()"></div>
+    <div class="card"><div class="cl">Denetim Alan&#305;</div><div class="ag" id="aGrid"></div></div>
+    <button class="btn bp" id="bBtn" onclick="dBaslat()" disabled>Denetimi ba&#351;lat</button>
   </div>
 </div>
 
-<!-- SCREEN 2: DENETİM FORMU -->
 <div class="screen" id="s2">
   <div class="topbar">
-    <button class="topbar-back" onclick="denetimCikConfirm()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <div class="topbar-info">
-      <div class="topbar-title" id="s2-title">Denetim</div>
-      <div class="topbar-sub" id="s2-sub"></div>
-    </div>
-    <div class="topbar-badge" id="s2-badge">0/0</div>
+    <button class="bk" onclick="if(confirm('&#199;&#305;kmak istiyor musunuz? Veriler kaybolacak.'))goScreen('s1')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="ti"><div class="tt" id="s2T">Denetim</div><div class="ts" id="s2S"></div></div>
+    <div class="tbadge" id="s2B">0/0</div>
   </div>
-  <div class="body" id="formBody">
-  </div>
+  <div class="body" id="fBody"></div>
 </div>
 
-<!-- SCREEN 3: FOTOĞRAF -->
 <div class="screen" id="s3">
   <div class="topbar">
-    <button class="topbar-back" onclick="goScreen('s2')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <div class="topbar-info">
-      <div class="topbar-title">Uygunsuzluk fotoğrafı</div>
-      <div class="topbar-sub" id="s3-sub"></div>
-    </div>
+    <button class="bk" onclick="goScreen('s2')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="ti"><div class="tt">Uygunsuzluk foto&#287;raf&#305;</div><div class="ts" id="s3S"></div></div>
   </div>
   <div class="body">
-    <div class="card" style="background:#FFF5F5;border-color:#FCA5A5">
-      <div class="card-label" style="color:var(--red)">Soru</div>
-      <div class="foto-soru" id="s3-soru"></div>
-    </div>
-    <div class="card">
-      <div class="card-label">Not ekle</div>
-      <textarea id="s3-not" placeholder="Uygunsuzluğu kısaca açıklayın..." rows="3"></textarea>
-    </div>
-    <div id="fotoArea">
-      <div class="foto-upload-area" onclick="fotoSec()">
-        <div class="foto-upload-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </div>
-        <div class="foto-upload-label">Fotoğraf çek / seç</div>
-        <div class="foto-upload-hint">Uygunsuzluğun net görüleceği<br>bir fotoğraf ekleyin</div>
-        <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none" onchange="fotoYuklendi(this)">
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="fotoKaydet()">Kaydet ve geri dön</button>
-    <button class="btn btn-secondary" onclick="goScreen('s2')" style="margin-top:-4px">Fotoğrafsız devam et</button>
+    <div class="card" style="background:#FFF5F5;border-color:#FCA5A5"><div class="cl" style="color:var(--red)">Soru</div><div style="font-size:13px;color:var(--text);line-height:1.5" id="s3Q"></div></div>
+    <div class="card"><div class="cl">Not / A&#231;&#305;klama</div><textarea id="s3N" placeholder="Uygunsuzlu&#287;u k&#305;saca a&#231;&#305;klay&#305;n..." rows="3"></textarea></div>
+    <div id="s3FA"></div>
+    <input type="file" id="fK" accept="image/*" style="display:none" onchange="fSec(this)">
+    <input type="file" id="fG" accept="image/*" style="display:none" onchange="fSec(this)">
+    <button class="btn bp" style="margin-top:4px" onclick="fKaydet()">Kaydet ve geri d&#246;n</button>
+    <button class="btn bs" onclick="goScreen('s2')" style="margin-top:-4px">Foto&#287;rafs&#305;z devam et</button>
   </div>
 </div>
 
-<!-- SCREEN 4: ÖZET -->
 <div class="screen" id="s4">
-  <div class="topbar">
-    <div class="topbar-info">
-      <div class="topbar-title">Denetim özeti</div>
-      <div class="topbar-sub" id="s4-sub"></div>
-    </div>
-  </div>
+  <div class="topbar"><div class="ti"><div class="tt">Denetim &#214;zeti</div><div class="ts" id="s4S"></div></div></div>
   <div class="body">
-    <div class="score-hero" id="scoreHero">
-      <div class="score-num" id="scoreNum">—</div>
-      <div class="score-label">Genel skor</div>
-      <div class="score-badges" id="scoreBadges"></div>
-    </div>
-
+    <div class="sh" id="sH"><div class="sn2" id="sN">-</div><div class="sl2">Genel skor</div><div class="sbd" id="sBd"></div></div>
+    <div class="card"><div class="cl">Kategori Skorlar&#305;</div><div id="kRws"></div></div>
+    <div class="card" id="hCard" style="display:none"><div class="cl" style="color:var(--red)">Uygunsuzluklar</div><div id="hList"></div></div>
     <div class="card">
-      <div class="card-label">Kategori skorları</div>
-      <div id="katRows"></div>
+      <div class="cl">Denetim Bilgileri</div>
+      <div class="ir"><span class="ik">Alan</span><span class="iv" id="s4A"></span></div>
+      <div class="ir"><span class="ik">Platform</span><span class="iv" id="s4P"></span></div>
+      <div class="ir"><span class="ik">Denet&#231;i</span><span class="iv" id="s4D"></span></div>
+      <div class="ir"><span class="ik">Tarih</span><span class="iv" id="s4T"></span></div>
     </div>
-
-    <div class="card" id="hayirCard" style="display:none">
-      <div class="card-label" style="color:var(--red)">Uygunsuzluklar</div>
-      <div id="hayirList"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Denetim bilgileri</div>
-      <div class="info-row"><span class="info-key">Alan</span><span class="info-val" id="s4-alan"></span></div>
-      <div class="info-row"><span class="info-key">Platform</span><span class="info-val" id="s4-platform"></span></div>
-      <div class="info-row"><span class="info-key">Denetçi</span><span class="info-val" id="s4-denetci"></span></div>
-      <div class="info-row"><span class="info-key">Tarih</span><span class="info-val" id="s4-tarih"></span></div>
-    </div>
-
-    <button class="btn btn-primary" onclick="exportJSON()">Kaydet / Dışa aktar</button>
-    <button class="btn btn-secondary" onclick="yeniDenetim()" style="margin-top:-4px">Yeni denetim</button>
+    <button class="btn bp" id="kBtn" onclick="spGonder()">SharePoint&#39;e Kaydet</button>
+    <button class="btn bs" style="margin-top:-4px" onclick="goScreen('s1')">Yeni Denetim</button>
   </div>
 </div>
-
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-const ALANLAR = {"A01":"İade Alanı","A02":"Mal Kabul","A03":"MZ Raf Alanları","A04":"Akü-YK Raf Alanları","A05":"Sevkiyat","A06":"Rampa","A07":"MZ - Paketleme","A08":"YK - Paketleme"};
-const PLATFORMLAR = {"P01":{"ad":"Platform L","aktif":"Evet"},"P02":{"ad":"Platform L2","aktif":"Evet"},"P03":{"ad":"Platform L3","aktif":"Evet"},"P05":{"ad":"Mercedes","aktif":"Evet"},"P06":{"ad":"Platform S2","aktif":"Evet"},"P07":{"ad":"Platform M3","aktif":"Evet"},"P08":{"ad":"Platform S","aktif":"Evet"},"P09":{"ad":"Platform X","aktif":"Evet"},"P10":{"ad":"Platform M","aktif":"Evet"},"P11":{"ad":"Platform C","aktif":"Evet"}};
-const SORULAR = [{"id":"S001","alanID":"A01","kategori":"1S","siraNo":1,"soru":"Alanda operasyonu yürütmek için gerekli tüm eşyalar (ürün, malzeme, ekipman, KKD vb.) tanımlanmıştır ve tanım dışı eşya yoktur.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S002","alanID":"A01","kategori":"1S","siraNo":2,"soru":"Raflara geri dönecek ürünler ile imhaya gidecek ürünler net şekilde ayrılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S003","alanID":"A01","kategori":"1S","siraNo":3,"soru":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır.\n(Örn: Yangın dolabı, acil çıkış kapısı, ilk yardım vb. önü kapalı değildir.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S004","alanID":"A01","kategori":"1S","siraNo":4,"soru":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir.\n(Kırmızı etiket uygulamasıyla tanımlı alana taşınmış ve kayıt altına alınmıştır.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S006","alanID":"A01","kategori":"2S","siraNo":6,"soru":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır.\n(Örn: İade ürünleri paletli ve tanımlı alanlarda düzenli şekilde konumlandırılmıştır.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S007","alanID":"A01","kategori":"2S","siraNo":7,"soru":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S008","alanID":"A01","kategori":"2S","siraNo":8,"soru":"İade kontrol ve ayrıştırma masaları düzenli ve erişilebilirdir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S009","alanID":"A01","kategori":"2S","siraNo":9,"soru":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır (basınç barları yeşildedir).","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S011","alanID":"A01","kategori":"3S","siraNo":11,"soru":"Alan ve zemin temizdir.\n(Örn: Zemin üzerinde ambalaj, palet parçası veya yabancı madde bulunmamaktadır.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S012","alanID":"A01","kategori":"3S","siraNo":12,"soru":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır.\n(Örn: Scanner, PC, yazıcı gibi ekipmanlar vb.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S013","alanID":"A01","kategori":"3S","siraNo":13,"soru":"Alanda hasarlı ekipman bulunmamaktadır.\nÖrn: Kırık palet, bozuk scanner vb.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S014","alanID":"A01","kategori":"3S","siraNo":14,"soru":"Alan atık ve çöplerden arındırılmıştır.\n(Örn: Yürüyüş/kaçış yollarında ve alan zemininde atık bulunmamaktadır.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S015","alanID":"A01","kategori":"3S","siraNo":15,"soru":"Temizlik faaliyetleri düzenli sürdürülmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S017","alanID":"A01","kategori":"4S","siraNo":17,"soru":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir.\n(Örn: Seçilen çalışanlar genel hatlarıyla 5S prensiplerini açıklayabilmektedir.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S018","alanID":"A01","kategori":"4S","siraNo":18,"soru":"Alana ait standart yerleşim (layout) ve/veya görsel standartlar alanda paylaşılmıştır.\n(Örn: Alan planı, masa standardı vb.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S019","alanID":"A01","kategori":"4S","siraNo":19,"soru":"Alanda 5S faaliyetleri için kullanılan form ve dokümanlar günceldir.\n(Örn: 5S denetim formu, temizlik kontrol formu, talimatlar vb.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S020","alanID":"A01","kategori":"4S","siraNo":20,"soru":"Paketleme alanında bulunan çalışanlar zorunlu KKD'leri kullanmaktadır.\n(Örn: Çelik burunlu ayakkabı, reflektör yelek, eldiven vb.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S022","alanID":"A01","kategori":"5S","siraNo":22,"soru":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S023","alanID":"A01","kategori":"5S","siraNo":23,"soru":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S024","alanID":"A01","kategori":"5S","siraNo":24,"soru":"Bir önceki denetimde tespit edilen olumsuzluklar için aksiyon planları ve iyileştirici faaliyetler takip edilmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S025","alanID":"A01","kategori":"5S","siraNo":25,"soru":"İyi uygulamalar ve başarılı ekipler, 5S panolarında paylaşılmakta ve takdir edilmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S027","alanID":"A02","kategori":"1S","siraNo":1,"soru":"Alanda operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur.\n(örn: Gereksiz palet, ambalaj ve atıklar alanda bulunmamaktadır.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S028","alanID":"A02","kategori":"1S","siraNo":2,"soru":"Hasarlı veya eksik gelen ürünler sağlam ürünlerden ayrılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S029","alanID":"A02","kategori":"1S","siraNo":3,"soru":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır.\n(Örn: Yangın dolabı, acil çıkış kapısı, ilk yardım vb. önü kapalı değildir.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S030","alanID":"A02","kategori":"1S","siraNo":4,"soru":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S032","alanID":"A02","kategori":"2S","siraNo":6,"soru":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır.\n(Örn: Boş paletler, hasarlı ürünler, incelenecek ürünler vb.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S033","alanID":"A02","kategori":"2S","siraNo":7,"soru":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S034","alanID":"A02","kategori":"2S","siraNo":8,"soru":"Alanda kullanılan malzemeler düzgün şekilde istiflenmiştir.\n(Örn: Paletler üst üste istifleme kurallarına uygun şekilde konumlandırılmıştır.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S035","alanID":"A02","kategori":"2S","siraNo":9,"soru":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır (basınç barları yeşildedir).","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S037","alanID":"A02","kategori":"3S","siraNo":11,"soru":"Alan ve zemin temizdir.\n(Örn: Zemin üzerinde ambalaj, palet parçası veya yabancı madde bulunmamaktadır.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S038","alanID":"A02","kategori":"3S","siraNo":12,"soru":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S039","alanID":"A02","kategori":"3S","siraNo":13,"soru":"Alanda hasarlı ekipman bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S040","alanID":"A02","kategori":"3S","siraNo":14,"soru":"Alan atık ve çöplerden arındırılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S041","alanID":"A02","kategori":"3S","siraNo":15,"soru":"Temizlik faaliyetleri düzenli sürdürülmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S043","alanID":"A02","kategori":"4S","siraNo":17,"soru":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S044","alanID":"A02","kategori":"4S","siraNo":18,"soru":"Alana ait standart yerleşim (layout) ve/veya görsel standartlar alanda paylaşılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S045","alanID":"A02","kategori":"4S","siraNo":19,"soru":"Alanda 5S faaliyetleri için kullanılan form ve dokümanlar günceldir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S048","alanID":"A02","kategori":"5S","siraNo":22,"soru":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S049","alanID":"A02","kategori":"5S","siraNo":23,"soru":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S050","alanID":"A02","kategori":"5S","siraNo":24,"soru":"Bir önceki denetimde tespit edilen olumsuzluklar için aksiyon planları takip edilmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S051","alanID":"A02","kategori":"5S","siraNo":25,"soru":"İyi uygulamalar ve başarılı ekipler, 5S panolarında paylaşılmakta ve takdir edilmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S053","alanID":"A03","kategori":"1S","siraNo":1,"soru":"Depolama alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S054","alanID":"A03","kategori":"1S","siraNo":2,"soru":"Hasarlı ürünler alandan ayrılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S055","alanID":"A03","kategori":"1S","siraNo":3,"soru":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S056","alanID":"A03","kategori":"1S","siraNo":4,"soru":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S058","alanID":"A03","kategori":"2S","siraNo":6,"soru":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır.\n(Örn: Raf lokasyonları (raf no, kat, göz) açık ve anlaşılır şekilde tanımlanmıştır.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S059","alanID":"A03","kategori":"2S","siraNo":7,"soru":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S060","alanID":"A03","kategori":"2S","siraNo":8,"soru":"Ürünler tanımlı lokasyonlarında ve belirlenen düzen içinde depolanmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S061","alanID":"A03","kategori":"2S","siraNo":9,"soru":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır (basınç barları yeşildedir).","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S063","alanID":"A03","kategori":"3S","siraNo":11,"soru":"Raflar, zemin, çevre alanlar temizdir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S064","alanID":"A03","kategori":"3S","siraNo":12,"soru":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır.\n(örn: Forklifler, Toplama arabaları, RF okuyucular vb.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S065","alanID":"A03","kategori":"3S","siraNo":13,"soru":"Alanda hasarlı ekipman bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S066","alanID":"A03","kategori":"3S","siraNo":14,"soru":"Alan atık ve çöplerden arındırılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S067","alanID":"A03","kategori":"3S","siraNo":15,"soru":"Temizlik faaliyetleri düzenli sürdürülmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S069","alanID":"A03","kategori":"4S","siraNo":17,"soru":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S070","alanID":"A03","kategori":"4S","siraNo":18,"soru":"Alana ait standart yerleşim (layout) ve/veya görsel standartlar alanda paylaşılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S074","alanID":"A03","kategori":"5S","siraNo":22,"soru":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S075","alanID":"A03","kategori":"5S","siraNo":23,"soru":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S079","alanID":"A04","kategori":"1S","siraNo":1,"soru":"Depolama alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S080","alanID":"A04","kategori":"1S","siraNo":2,"soru":"Hasarlı ürünler alandan ayrılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S081","alanID":"A04","kategori":"1S","siraNo":3,"soru":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S082","alanID":"A04","kategori":"1S","siraNo":4,"soru":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S084","alanID":"A04","kategori":"2S","siraNo":6,"soru":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır.\n(Örn: Akü şarj noktaları net şekilde etiketlenmiştir.)","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S085","alanID":"A04","kategori":"2S","siraNo":7,"soru":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S086","alanID":"A04","kategori":"2S","siraNo":8,"soru":"Ürünler tanımlı lokasyonlarında ve belirlenen düzen içinde depolanmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S089","alanID":"A04","kategori":"3S","siraNo":11,"soru":"Raflar, zemin, çevre alanlar temizdir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S090","alanID":"A04","kategori":"3S","siraNo":12,"soru":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S091","alanID":"A04","kategori":"3S","siraNo":13,"soru":"Alanda hasarlı ekipman bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S092","alanID":"A04","kategori":"3S","siraNo":14,"soru":"Alan atık ve çöplerden arındırılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S105","alanID":"A05","kategori":"1S","siraNo":1,"soru":"Alanda operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S106","alanID":"A05","kategori":"1S","siraNo":2,"soru":"Paletler tanımlı alanlarda istiflenmiştir, geçiş/yürüyüş yollarını engellememektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S107","alanID":"A05","kategori":"1S","siraNo":3,"soru":"Transpalet / forklift vb. ekipmanlar tanımlı park alanlarında konumlandırılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S108","alanID":"A05","kategori":"1S","siraNo":4,"soru":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S113","alanID":"A05","kategori":"2S","siraNo":8,"soru":"Alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S114","alanID":"A05","kategori":"2S","siraNo":9,"soru":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S115","alanID":"A05","kategori":"2S","siraNo":10,"soru":"Paletler istif yükseliğine uygun şekilde istiflenmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S120","alanID":"A05","kategori":"3S","siraNo":14,"soru":"Zemin ve kullanılan ekipmanlar temizdir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S121","alanID":"A05","kategori":"3S","siraNo":15,"soru":"Alan atık ve çöplerden arındırılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S127","alanID":"A05","kategori":"4S","siraNo":20,"soru":"Rampa alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S128","alanID":"A05","kategori":"4S","siraNo":21,"soru":"Rampa alanına ait standart yerleşim (layout) ve/veya görsel standartlar alanda paylaşılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S133","alanID":"A05","kategori":"5S","siraNo":25,"soru":"Rampa alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S138","alanID":"A06","kategori":"1S","siraNo":1,"soru":"Rampa alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S139","alanID":"A06","kategori":"1S","siraNo":2,"soru":"Paletler tanımlı alanlarda istiflenmiştir, geçiş/yürüyüş yollarını engellememektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S140","alanID":"A06","kategori":"1S","siraNo":3,"soru":"Transpalet / forklift vb. ekipmanlar tanımlı park alanlarında konumlandırılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S145","alanID":"A06","kategori":"2S","siraNo":8,"soru":"Rampa alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S146","alanID":"A06","kategori":"2S","siraNo":9,"soru":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S151","alanID":"A06","kategori":"3S","siraNo":14,"soru":"Rampa alanı, zemin ve kullanılan ekipmanlar temizdir. Temizlik faaliyetleri düzenli sürdürülmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S152","alanID":"A06","kategori":"3S","siraNo":15,"soru":"Alan atık ve çöplerden arındırılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S153","alanID":"A06","kategori":"3S","siraNo":16,"soru":"Rampa kapıları çalışır ve bakımlı durumdadır, arızalı ekipman bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S154","alanID":"A06","kategori":"3S","siraNo":17,"soru":"Haşere kontrol istasyonları tesis edilen yerdedir. Haşere girişine sebep olacak boşluk bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S157","alanID":"A06","kategori":"4S","siraNo":20,"soru":"Rampa alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S162","alanID":"A06","kategori":"5S","siraNo":25,"soru":"Rampa alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S167","alanID":"A07","kategori":"1S","siraNo":1,"soru":"Paketleme alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S168","alanID":"A07","kategori":"1S","siraNo":2,"soru":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S169","alanID":"A07","kategori":"1S","siraNo":3,"soru":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S172","alanID":"A07","kategori":"2S","siraNo":5,"soru":"Paketleme alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S173","alanID":"A07","kategori":"2S","siraNo":6,"soru":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S174","alanID":"A07","kategori":"2S","siraNo":7,"soru":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır (basınç barları yeşildedir).","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S178","alanID":"A07","kategori":"3S","siraNo":10,"soru":"Paketleme alanı, masalar ve kullanılan ekipmanlar temizdir. Temizlik faaliyetleri düzenli sürdürülmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S179","alanID":"A07","kategori":"3S","siraNo":11,"soru":"Alan atık ve çöplerden arındırılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S180","alanID":"A07","kategori":"3S","siraNo":12,"soru":"Ekran/Mouse/Klavye mevcut ve çalışır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S181","alanID":"A07","kategori":"3S","siraNo":13,"soru":"Scanner mevcut ve çalışır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S182","alanID":"A07","kategori":"3S","siraNo":14,"soru":"Kargo etiketi yazıcısı mevcut ve çalışır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S185","alanID":"A07","kategori":"4S","siraNo":16,"soru":"Paketleme alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S188","alanID":"A07","kategori":"4S","siraNo":19,"soru":"Paketleme alanında bulunan çalışanlar zorunlu KKD'leri kullanmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S191","alanID":"A07","kategori":"5S","siraNo":21,"soru":"Paketleme alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S192","alanID":"A07","kategori":"5S","siraNo":22,"soru":"Paketleme alanının güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S196","alanID":"A08","kategori":"1S","siraNo":1,"soru":"Paketleme alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S197","alanID":"A08","kategori":"1S","siraNo":2,"soru":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S201","alanID":"A08","kategori":"2S","siraNo":5,"soru":"Paketleme alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S207","alanID":"A08","kategori":"3S","siraNo":10,"soru":"Paketleme alanı, masalar ve kullanılan ekipmanlar temizdir. Temizlik faaliyetleri düzenli sürdürülmektedir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S209","alanID":"A08","kategori":"3S","siraNo":12,"soru":"Ekran/Mouse/Klavye mevcut ve çalışır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S210","alanID":"A08","kategori":"3S","siraNo":13,"soru":"Scanner mevcut ve çalışır durumdadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S214","alanID":"A08","kategori":"4S","siraNo":16,"soru":"Paketleme alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"},{"id":"S220","alanID":"A08","kategori":"5S","siraNo":21,"soru":"Paketleme alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır.","maksPuan":5,"fotoKural":"HayırdaZorunlu","kritik":"Evet"}];
+const PA='https://default659c3a90ec904772b772cebe2050a8.2e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fef6810e4df745818f4cebd6990d5277/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bYG93e6RT0Cefm-XRexYS0gvP_XABb0pQH4cBHvNx90';
+const AL={"A01":"İade Alanı","A02":"Mal Kabul","A03":"MZ Raf Alanları","A04":"Akü-YK Raf Alanları","A05":"Sevkiyat","A06":"Rampa","A07":"MZ - Paketleme","A08":"YK - Paketleme"};
+const PL={"P01":"Platform L","P02":"Platform L2","P03":"Platform L3","P05":"Mercedes","P06":"Platform S2","P07":"Platform M3","P08":"Platform S","P09":"Platform X","P10":"Platform M","P11":"Platform C"};
+const SR=[{"id":"S001","alanID":"A01","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar (ürün, malzeme, ekipman, KKD vb.) tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S002","alanID":"A01","k":"1S","no":2,"s":"Raflara geri dönecek ürünler ile imhaya gidecek ürünler net şekilde ayrılmıştır."},{"id":"S003","alanID":"A01","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S004","alanID":"A01","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S006","alanID":"A01","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S007","alanID":"A01","k":"2S","no":7,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S008","alanID":"A01","k":"2S","no":8,"s":"İade kontrol ve ayrıştırma masaları düzenli ve erişilebilirdir."},{"id":"S009","alanID":"A01","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır (basınç barları yeşildedir)."},{"id":"S011","alanID":"A01","k":"3S","no":11,"s":"Alan ve zemin temizdir."},{"id":"S012","alanID":"A01","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S013","alanID":"A01","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S014","alanID":"A01","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S015","alanID":"A01","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S017","alanID":"A01","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S018","alanID":"A01","k":"4S","no":18,"s":"Alana ait standart yerleşim (layout) ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S019","alanID":"A01","k":"4S","no":19,"s":"Alanda 5S faaliyetleri için kullanılan form ve dokümanlar günceldir."},{"id":"S020","alanID":"A01","k":"4S","no":20,"s":"Çalışanlar zorunlu KKD'leri kullanmaktadır."},{"id":"S022","alanID":"A01","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S023","alanID":"A01","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S024","alanID":"A01","k":"5S","no":24,"s":"Bir önceki denetimde tespit edilen olumsuzluklar için aksiyon planları takip edilmektedir."},{"id":"S025","alanID":"A01","k":"5S","no":25,"s":"İyi uygulamalar ve başarılı ekipler, 5S panolarında paylaşılmakta ve takdir edilmektedir."},{"id":"S027","alanID":"A02","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S028","alanID":"A02","k":"1S","no":2,"s":"Hasarlı veya eksik gelen ürünler sağlam ürünlerden ayrılmıştır."},{"id":"S029","alanID":"A02","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S030","alanID":"A02","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S032","alanID":"A02","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S033","alanID":"A02","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S034","alanID":"A02","k":"2S","no":8,"s":"Alanda kullanılan malzemeler düzgün şekilde istiflenmiştir."},{"id":"S035","alanID":"A02","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S037","alanID":"A02","k":"3S","no":11,"s":"Alan ve zemin temizdir."},{"id":"S038","alanID":"A02","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S039","alanID":"A02","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S040","alanID":"A02","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S041","alanID":"A02","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S043","alanID":"A02","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S044","alanID":"A02","k":"4S","no":18,"s":"Alana ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S045","alanID":"A02","k":"4S","no":19,"s":"Alanda 5S faaliyetleri için kullanılan form ve dokümanlar günceldir."},{"id":"S048","alanID":"A02","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S049","alanID":"A02","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S050","alanID":"A02","k":"5S","no":24,"s":"Bir önceki denetimde tespit edilen olumsuzluklar için aksiyon planları takip edilmektedir."},{"id":"S051","alanID":"A02","k":"5S","no":25,"s":"İyi uygulamalar ve başarılı ekipler, 5S panolarında paylaşılmakta ve takdir edilmektedir."},{"id":"S053","alanID":"A03","k":"1S","no":1,"s":"Depolama alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S054","alanID":"A03","k":"1S","no":2,"s":"Hasarlı ürünler alandan ayrılmıştır."},{"id":"S055","alanID":"A03","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S056","alanID":"A03","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S058","alanID":"A03","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S059","alanID":"A03","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S060","alanID":"A03","k":"2S","no":8,"s":"Ürünler tanımlı lokasyonlarında ve belirlenen düzen içinde depolanmaktadır."},{"id":"S061","alanID":"A03","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S063","alanID":"A03","k":"3S","no":11,"s":"Raflar, zemin, çevre alanlar temizdir."},{"id":"S064","alanID":"A03","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S065","alanID":"A03","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S066","alanID":"A03","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S067","alanID":"A03","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S069","alanID":"A03","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S070","alanID":"A03","k":"4S","no":18,"s":"Alana ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S074","alanID":"A03","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S075","alanID":"A03","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S079","alanID":"A04","k":"1S","no":1,"s":"Depolama alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S080","alanID":"A04","k":"1S","no":2,"s":"Hasarlı ürünler alandan ayrılmıştır."},{"id":"S081","alanID":"A04","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S084","alanID":"A04","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S085","alanID":"A04","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S086","alanID":"A04","k":"2S","no":8,"s":"Ürünler tanımlı lokasyonlarında ve belirlenen düzen içinde depolanmaktadır."},{"id":"S089","alanID":"A04","k":"3S","no":11,"s":"Raflar, zemin, çevre alanlar temizdir."},{"id":"S090","alanID":"A04","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S091","alanID":"A04","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S092","alanID":"A04","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S105","alanID":"A05","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S106","alanID":"A05","k":"1S","no":2,"s":"Paletler tanımlı alanlarda istiflenmiştir, geçiş/yürüyüş yollarını engellememektedir."},{"id":"S107","alanID":"A05","k":"1S","no":3,"s":"Transpalet / forklift vb. ekipmanlar tanımlı park alanlarında konumlandırılmıştır."},{"id":"S108","alanID":"A05","k":"1S","no":4,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S113","alanID":"A05","k":"2S","no":8,"s":"Alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S114","alanID":"A05","k":"2S","no":9,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S115","alanID":"A05","k":"2S","no":10,"s":"Paletler istif yükseliğine uygun şekilde istiflenmiştir."},{"id":"S120","alanID":"A05","k":"3S","no":14,"s":"Zemin ve kullanılan ekipmanlar temizdir."},{"id":"S121","alanID":"A05","k":"3S","no":15,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S127","alanID":"A05","k":"4S","no":20,"s":"Rampa alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S128","alanID":"A05","k":"4S","no":21,"s":"Rampa alanına ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S133","alanID":"A05","k":"5S","no":25,"s":"Rampa alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S138","alanID":"A06","k":"1S","no":1,"s":"Rampa alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S139","alanID":"A06","k":"1S","no":2,"s":"Paletler tanımlı alanlarda istiflenmiştir, geçiş/yürüyüş yollarını engellememektedir."},{"id":"S140","alanID":"A06","k":"1S","no":3,"s":"Transpalet / forklift vb. ekipmanlar tanımlı park alanlarında konumlandırılmıştır."},{"id":"S145","alanID":"A06","k":"2S","no":8,"s":"Rampa alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S146","alanID":"A06","k":"2S","no":9,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S151","alanID":"A06","k":"3S","no":14,"s":"Rampa alanı, zemin ve kullanılan ekipmanlar temizdir. Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S152","alanID":"A06","k":"3S","no":15,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S153","alanID":"A06","k":"3S","no":16,"s":"Rampa kapıları çalışır ve bakımlı durumdadır, arızalı ekipman bulunmamaktadır."},{"id":"S154","alanID":"A06","k":"3S","no":17,"s":"Haşere kontrol istasyonları tesis edilen yerdedir."},{"id":"S157","alanID":"A06","k":"4S","no":20,"s":"Rampa alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S162","alanID":"A06","k":"5S","no":25,"s":"Rampa alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S167","alanID":"A07","k":"1S","no":1,"s":"Paketleme alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S168","alanID":"A07","k":"1S","no":2,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S169","alanID":"A07","k":"1S","no":3,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S172","alanID":"A07","k":"2S","no":5,"s":"Paketleme alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S173","alanID":"A07","k":"2S","no":6,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S174","alanID":"A07","k":"2S","no":7,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S178","alanID":"A07","k":"3S","no":10,"s":"Paketleme alanı, masalar ve kullanılan ekipmanlar temizdir."},{"id":"S179","alanID":"A07","k":"3S","no":11,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S180","alanID":"A07","k":"3S","no":12,"s":"Ekran/Mouse/Klavye mevcut ve çalışır durumdadır."},{"id":"S181","alanID":"A07","k":"3S","no":13,"s":"Scanner mevcut ve çalışır durumdadır."},{"id":"S182","alanID":"A07","k":"3S","no":14,"s":"Kargo etiketi yazıcısı mevcut ve çalışır durumdadır."},{"id":"S185","alanID":"A07","k":"4S","no":16,"s":"Paketleme alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S188","alanID":"A07","k":"4S","no":19,"s":"Paketleme alanında bulunan çalışanlar zorunlu KKD'leri kullanmaktadır."},{"id":"S191","alanID":"A07","k":"5S","no":21,"s":"Paketleme alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S192","alanID":"A07","k":"5S","no":22,"s":"Paketleme alanının güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S196","alanID":"A08","k":"1S","no":1,"s":"Paketleme alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S197","alanID":"A08","k":"1S","no":2,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S201","alanID":"A08","k":"2S","no":5,"s":"Paketleme alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S207","alanID":"A08","k":"3S","no":10,"s":"Paketleme alanı, masalar ve kullanılan ekipmanlar temizdir."},{"id":"S209","alanID":"A08","k":"3S","no":12,"s":"Ekran/Mouse/Klavye mevcut ve çalışır durumdadır."},{"id":"S210","alanID":"A08","k":"3S","no":13,"s":"Scanner mevcut ve çalışır durumdadır."},{"id":"S214","alanID":"A08","k":"4S","no":16,"s":"Paketleme alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S220","alanID":"A08","k":"5S","no":21,"s":"Paketleme alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."}];
 
-// STATE
-let state = { platformID: null, alanID: null, denetci: '', sorular: [], cevaplar: {}, notlar: {}, fotograflar: {}, aktifFotoSoru: null };
+let st={pid:null,aid:null,dc:'',sr:[],cv:{},nt:{},ft:{},as:null};
+let qrStr=null,qrAF=null;
 
-// INIT
-function init() {
-  const pList = document.getElementById('platformList');
-  pList.innerHTML = '';
-  Object.entries(PLATFORMLAR).filter(([,p])=>p.aktif==='Evet').forEach(([id,p])=>{
-    const btn = document.createElement('button');
-    btn.className = 'platform-btn';
-    btn.innerHTML = `<span>${p.ad}</span><span class="pid">${id}</span>`;
-    btn.onclick = () => platformSec(id);
-    pList.appendChild(btn);
-  });
+function triggerCamera(){
+  var fk = document.getElementById('fK');
+  fk.removeAttribute('capture');
+  fk.setAttribute('capture','environment');
+  fk.click();
 }
 
-function platformSec(pid) {
-  state.platformID = pid;
-  document.getElementById('s1b-platform-title').textContent = PLATFORMLAR[pid].ad;
-  const grid = document.getElementById('alanGrid');
-  grid.innerHTML = '';
-  Object.entries(ALANLAR).forEach(([id, ad]) => {
-    const s = SORULAR.filter(s=>s.alanID===id);
-    if (!s.length) return;
-    const btn = document.createElement('button');
-    btn.className = 'alan-btn';
-    btn.innerHTML = `<div class="alan-id">${id}</div>${ad}`;
-    btn.onclick = () => {
-      document.querySelectorAll('.alan-btn').forEach(b=>b.classList.remove('selected'));
-      btn.classList.add('selected');
-      state.alanID = id;
-      checkBaslatBtn();
-    };
-    grid.appendChild(btn);
+function init(){
+  const ps=document.getElementById('pSel');
+  Object.entries(PL).forEach(([id,ad])=>{const o=document.createElement('option');o.value=id;o.textContent=ad+' ('+id+')';ps.appendChild(o);});
+  const as=document.getElementById('aSel');
+  Object.entries(AL).forEach(([id,ad])=>{const o=document.createElement('option');o.value=id;o.textContent=ad;as.appendChild(o);});
+}
+
+function chkM(){
+  const p=document.getElementById('pSel').value;
+  const a=document.getElementById('aSel').value;
+  const m=document.getElementById('qrM').value.trim();
+  const ok = (p && a) || m.match(/^P\d{2}-A\d{2}$/);
+  document.getElementById('mBtn').disabled = !ok;
+}
+
+function manuelGiris(){
+  const m=document.getElementById('qrM').value.trim().toUpperCase();
+  let pid,aid;
+  if(m.match(/^P\d{2}-A\d{2}$/)){[pid,aid]=m.split('-');}
+  else{pid=document.getElementById('pSel').value;aid=document.getElementById('aSel').value;}
+  if(!PL[pid]){showToast('Geçersiz platform: '+pid);return;}
+  if(!AL[aid]){showToast('Geçersiz alan: '+aid);return;}
+  st.pid=pid;st.aid=aid;goAlan();
+}
+
+function goAlan(){
+  document.getElementById('s1bT').textContent=PL[st.pid];
+  const g=document.getElementById('aGrid');g.innerHTML='';
+  Object.entries(AL).forEach(([id,ad])=>{
+    if(!SR.some(s=>s.alanID===id))return;
+    const b=document.createElement('button');
+    b.className='ab'+(id===st.aid?' sel':'');
+    b.innerHTML='<div class="aid">'+id+'</div>'+ad;
+    b.onclick=()=>{document.querySelectorAll('.ab').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');st.aid=id;chkB();};
+    g.appendChild(b);
   });
   goScreen('s1b');
 }
 
-function checkBaslatBtn() {
-  const d = document.getElementById('denetciAdi').value.trim();
-  document.getElementById('baslatBtn').disabled = !(state.alanID && d);
-}
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('denetciAdi').addEventListener('input', checkBaslatBtn);
-});
+function chkB(){document.getElementById('bBtn').disabled=!(st.aid&&document.getElementById('dAdi').value.trim());}
 
-function qrGiris() {
-  const val = document.getElementById('qrInput').value.trim().toUpperCase();
-  if (!val.match(/^P\d{2}-A\d{2}$/)) { showToast('Geçersiz format! Örn: P01-A01'); return; }
-  const [pid, aid] = val.split('-');
-  if (!PLATFORMLAR[pid] || !ALANLAR[aid]) { showToast('Bu QR koda ait alan bulunamadı'); return; }
-  state.platformID = pid;
-  document.getElementById('s1b-platform-title').textContent = PLATFORMLAR[pid].ad;
-  platformSec(pid);
-  setTimeout(()=>{
-    document.querySelectorAll('.alan-btn').forEach(b=>{
-      if(b.querySelector('.alan-id').textContent===aid) b.click();
-    });
-  }, 100);
-}
-
-function denetimBaslat() {
-  state.denetci = document.getElementById('denetciAdi').value.trim();
-  state.sorular = SORULAR.filter(s=>s.alanID===state.alanID);
-  state.cevaplar = {}; state.notlar = {}; state.fotograflar = {};
+function dBaslat(){
+  st.dc=document.getElementById('dAdi').value.trim();
+  st.sr=SR.filter(s=>s.alanID===st.aid);
+  st.cv={};st.nt={};st.ft={};
   renderForm();
-  document.getElementById('s2-title').textContent = ALANLAR[state.alanID];
-  document.getElementById('s2-sub').textContent = PLATFORMLAR[state.platformID].ad + ' · ' + state.alanID;
-  updateBadge();
-  goScreen('s2');
+  document.getElementById('s2T').textContent=AL[st.aid];
+  document.getElementById('s2S').textContent=PL[st.pid]+' · '+st.pid;
+  updBadge();goScreen('s2');
 }
 
-function renderForm() {
-  const body = document.getElementById('formBody');
-  const kats = [...new Set(state.sorular.map(s=>s.kategori))].sort();
-  let html = `<div class="card" style="padding:12px 14px"><div class="progress-wrap">
-    <div class="progress-top"><span class="progress-label">Tamamlanan sorular</span><span class="progress-count" id="pCount">0 / ${state.sorular.length}</span></div>
-    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
-  </div></div>`;
-
-  kats.forEach(kat => {
-    const ks = state.sorular.filter(s=>s.kategori===kat);
-    const katLabels = {'1S':'1S · Ayıkla','2S':'2S · Düzenle','3S':'3S · Temizle','4S':'4S · Standartlaştır','5S':'5S · Sürdür'};
-    html += `<div class="kategori-header" id="kat-${kat}"><span>${katLabels[kat]||kat}</span><span class="kat-score" id="kscore-${kat}">—</span></div>`;
-    ks.forEach(s => {
-      html += `<div class="soru-card" id="sc-${s.id}">
-        <div class="soru-meta">
-          <span class="soru-no">${s.id}</span>
-          ${s.kritik==='Evet'?'<span class="kritik-badge">Kritik</span>':''}
-        </div>
-        <div class="soru-text">${s.soru}</div>
-        <div class="cevap-row">
-          <button class="cevap-btn" id="btn-evet-${s.id}" onclick="cevapSec('${s.id}','Evet')">Evet</button>
-          <button class="cevap-btn" id="btn-hayir-${s.id}" onclick="cevapSec('${s.id}','Hayır')">Hayır</button>
-          <button class="cevap-btn" id="btn-na-${s.id}" onclick="cevapSec('${s.id}','NA')">N/A</button>
-        </div>
-        <div id="extra-${s.id}"></div>
-      </div>`;
-    });
-  });
-
-  html += `<button class="btn btn-primary" onclick="gotoOzet()" style="margin-top:4px">Denetimi tamamla</button>`;
-  body.innerHTML = html;
-}
-
-function cevapSec(sid, cevap) {
-  state.cevaplar[sid] = cevap;
-  const card = document.getElementById('sc-'+sid);
-  card.className = 'soru-card answered-'+cevap.toLowerCase().replace('/','');
-  ['Evet','Hayır','NA'].forEach(c => {
-    const btn = document.getElementById('btn-'+c.toLowerCase().replace('ı','i').replace('/','').replace('ı','i')+'-'+sid);
-    if(btn) btn.className = 'cevap-btn';
-  });
-  document.getElementById('btn-evet-'+sid).className = 'cevap-btn'+(cevap==='Evet'?' active-evet':'');
-  document.getElementById('btn-hayir-'+sid).className = 'cevap-btn'+(cevap==='Hayır'?' active-hayir':'');
-  document.getElementById('btn-na-'+sid).className = 'cevap-btn'+(cevap==='NA'?' active-na':'');
-
-  const extra = document.getElementById('extra-'+sid);
-  if (cevap === 'Hayır') {
-    const hasFoto = state.fotograflar[sid];
-    extra.innerHTML = `<div class="foto-mini" onclick="acFotoEkran('${sid}')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="${hasFoto?'#1D6A3A':'#C0392B'}" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      ${hasFoto?'<span class="foto-done">Fotoğraf eklendi</span>':'<span>Fotoğraf ekle (zorunlu)</span>'}
-    </div>`;
-    if (state.notlar[sid]) {
-      extra.innerHTML += `<div class="not-area"><textarea placeholder="Not..." oninput="state.notlar['${sid}']=this.value">${state.notlar[sid]||''}</textarea></div>`;
+async function startQR(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){showToast('Kamera desteklenmiyor');return;}
+  document.getElementById('qrS').style.display='none';
+  document.getElementById('qrV').style.display='flex';
+  try{
+    qrStr=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v=document.getElementById('qrVid');v.srcObject=qrStr;await v.play();
+    const c=document.createElement('canvas'),ctx=c.getContext('2d');
+    function tick(){
+      if(!qrStr)return;
+      if(v.readyState===v.HAVE_ENOUGH_DATA){
+        c.width=v.videoWidth;c.height=v.videoHeight;ctx.drawImage(v,0,0);
+        try{const img=ctx.getImageData(0,0,c.width,c.height);const code=window.jsQR&&jsQR(img.data,img.width,img.height);
+        if(code&&code.data){const val=code.data.toUpperCase().trim();const m=val.match(/P\d{2}-A\d{2}/);
+        if(m){const[pid,aid]=m[0].split('-');if(PL[pid]&&AL[aid]){stopQR();st.pid=pid;st.aid=aid;showToast('QR: '+m[0]);goAlan();return;}}
+        stopQR();showToast('Geçersiz QR kodu');return;}}catch(e){}
+      }
+      qrAF=requestAnimationFrame(tick);
     }
-  } else {
-    extra.innerHTML = '';
-  }
-  updateBadge();
-  updateKatScores();
+    qrAF=requestAnimationFrame(tick);
+  }catch(e){showToast('Kamera izni reddedildi');stopQR();}
 }
 
-function acFotoEkran(sid) {
-  state.aktifFotoSoru = sid;
-  const s = state.sorular.find(s=>s.id===sid);
-  document.getElementById('s3-soru').textContent = s.soru;
-  document.getElementById('s3-sub').textContent = s.id + ' · ' + s.kategori;
-  document.getElementById('s3-not').value = state.notlar[sid] || '';
-  const area = document.getElementById('fotoArea');
-  if (state.fotograflar[sid]) {
-    area.innerHTML = `<div class="foto-preview">
-      <div class="foto-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6A3A" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div><div style="font-size:13px;font-weight:600;color:#1D6A3A">Fotoğraf eklendi</div><div style="font-size:12px;color:#6B7280;margin-top:2px">${state.fotograflar[sid]}</div></div>
-    </div>
-    <div class="foto-upload-area" onclick="fotoSec()" style="margin-top:8px;padding:16px 20px">
-      <div class="foto-upload-label" style="font-size:13px">Fotoğrafı değiştir</div>
-      <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none" onchange="fotoYuklendi(this)">
-    </div>`;
-  } else {
-    area.innerHTML = `<div class="foto-upload-area" onclick="fotoSec()">
-      <div class="foto-upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-      <div class="foto-upload-label">Fotoğraf çek / seç</div>
-      <div class="foto-upload-hint">Uygunsuzluğun net görüleceği bir fotoğraf ekleyin</div>
-      <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none" onchange="fotoYuklendi(this)">
-    </div>`;
-  }
+function stopQR(){
+  if(qrAF){cancelAnimationFrame(qrAF);qrAF=null;}
+  if(qrStr){qrStr.getTracks().forEach(t=>t.stop());qrStr=null;}
+  document.getElementById('qrV').style.display='none';
+  document.getElementById('qrS').style.display='flex';
+}
+
+function renderForm(){
+  const kl=['1S','2S','3S','4S','5S'];
+  const kn={'1S':'1S · Ayıkla','2S':'2S · Düzenle','3S':'3S · Temizle','4S':'4S · Standartlaştır','5S':'5S · Sürdür'};
+  const kc={'1S':'#378ADD','2S':'#1D9E75','3S':'#E85D24','4S':'#7F77DD','5S':'#D85A30'};
+  let h=`<div class="card" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text-soft)">Tamamlanan</span><span style="font-size:12px;font-weight:600;color:var(--blue);font-family:'DM Mono',monospace" id="pC">0 / ${st.sr.length}</span></div><div class="pb"><div class="pf" id="pF" style="width:0%"></div></div></div>`;
+  kl.forEach(k=>{
+    const ks=st.sr.filter(s=>s.k===k);if(!ks.length)return;
+    h+=`<div class="kh" style="background:${kc[k]}"><span>${kn[k]}</span><span id="ks-${k}" style="font-family:'DM Mono',monospace;font-size:12px;opacity:.85">—</span></div>`;
+    ks.forEach(s=>{h+=`<div class="sc" id="sc-${s.id}"><div class="sm"><span class="sn">${s.id}</span><span class="kb">Kritik</span></div><div class="st">${s.s}</div><div class="cr"><button class="cb" id="ce-${s.id}" onclick="cv('${s.id}','Evet')">Evet</button><button class="cb" id="ch-${s.id}" onclick="cv('${s.id}','Hayır')">Hayır</button><button class="cb" id="cn-${s.id}" onclick="cv('${s.id}','NA')">N/A</button></div><div id="ex-${s.id}"></div></div>`;});
+  });
+  h+=`<button class="btn bp" style="margin-top:4px" onclick="gOzet()">Denetimi tamamla</button>`;
+  document.getElementById('fBody').innerHTML=h;
+}
+
+function cv(sid,c){
+  st.cv[sid]=c;
+  const card=document.getElementById('sc-'+sid);
+  card.className='sc '+(c==='Evet'?'ae':c==='Hayır'?'ah':'an');
+  ['ce','ch','cn'].forEach(x=>{const b=document.getElementById(x+'-'+sid);if(b)b.className='cb';});
+  if(c==='Evet')document.getElementById('ce-'+sid).className='cb ce';
+  if(c==='Hayır')document.getElementById('ch-'+sid).className='cb ch';
+  if(c==='NA')document.getElementById('cn-'+sid).className='cb cn';
+  const ex=document.getElementById('ex-'+sid);
+  if(c==='Hayır'){
+    const hf=!!st.ft[sid];
+    ex.innerHTML=`<div class="fp" onclick="acF('${sid}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${hf?'#1D6A3A':'#C0392B'}" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span style="font-size:12px;color:${hf?'#1D6A3A':'#C0392B'};font-weight:500">${hf?'Fotoğraf eklendi ✓':'Fotoğraf ekle (zorunlu)'}</span></div><textarea style="margin-top:8px;font-size:12px;min-height:36px" placeholder="Not ekle..." onchange="st.nt['${sid}']=this.value">${st.nt[sid]||''}</textarea>`;
+  }else{ex.innerHTML='';}
+  updBadge();updKat();
+}
+
+function acF(sid){
+  st.as=sid;
+  const s=st.sr.find(x=>x.id===sid);
+  document.getElementById('s3Q').textContent=s.s;
+  document.getElementById('s3S').textContent=s.id+' · '+s.k;
+  document.getElementById('s3N').value=st.nt[sid]||'';
+  const hf=st.ft[sid];
+  document.getElementById('s3FA').innerHTML=hf
+    ?`<div style="background:#F0FDF4;border:2px solid #86EFAC;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px"><div style="width:32px;height:32px;background:#E6F5EC;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6A3A" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#1D6A3A">Fotoğraf eklendi</div><div style="font-size:11px;color:var(--text-soft)">${hf}</div></div></div>`
+    :'';
+  document.getElementById('s3FA').innerHTML+=`<button class="fc-btn" onclick="document.getElementById('fK').click()"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span style="font-size:15px;font-weight:600">Kamera ile çek</span><span style="font-size:12px;opacity:.8">Anlık fotoğraf için dokunun</span></button><div style="display:flex;align-items:center;gap:8px;margin:8px 0"><div style="flex:1;height:1px;background:var(--gray-mid)"></div><span style="font-size:12px;color:var(--text-soft)">veya</span><div style="flex:1;height:1px;background:var(--gray-mid)"></div></div><button class="fg-btn" onclick="document.getElementById('fG').click()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Galeriden seç</button>`;
   goScreen('s3');
 }
 
-function fotoSec() { document.getElementById('fotoInput').click(); }
+function fSec(inp){if(inp.files&&inp.files[0]){st.ft[st.as]=inp.files[0].name;showToast('Fotoğraf: '+inp.files[0].name);}}
 
-function fotoYuklendi(input) {
-  if (input.files && input.files[0]) {
-    state.fotograflar[state.aktifFotoSoru] = input.files[0].name;
-    showToast('Fotoğraf eklendi: ' + input.files[0].name);
-  }
+function fKaydet(){
+  st.nt[st.as]=document.getElementById('s3N').value;
+  if(st.cv[st.as]==='Hayır')cv(st.as,'Hayır');
+  goScreen('s2');showToast('Kaydedildi!');
 }
 
-function fotoKaydet() {
-  const sid = state.aktifFotoSoru;
-  state.notlar[sid] = document.getElementById('s3-not').value;
-  if (state.cevaplar[sid]==='Hayır') cevapSec(sid,'Hayır');
-  goScreen('s2');
-  showToast('Kaydedildi!');
+function updBadge(){
+  const t=st.sr.length,d=Object.keys(st.cv).length;
+  document.getElementById('s2B').textContent=d+'/'+t;
+  const pc=document.getElementById('pC'),pf=document.getElementById('pF');
+  if(pc)pc.textContent=d+' / '+t;if(pf)pf.style.width=Math.round(d/t*100)+'%';
 }
 
-function updateBadge() {
-  const total = state.sorular.length;
-  const done = Object.keys(state.cevaplar).length;
-  document.getElementById('s2-badge').textContent = done + '/' + total;
-  const pCount = document.getElementById('pCount');
-  const pFill = document.getElementById('pFill');
-  if(pCount) pCount.textContent = done + ' / ' + total;
-  if(pFill) pFill.style.width = Math.round(done/total*100) + '%';
-}
-
-function updateKatScores() {
-  const kats = [...new Set(state.sorular.map(s=>s.kategori))];
-  kats.forEach(kat => {
-    const ks = state.sorular.filter(s=>s.kategori===kat);
-    const cevaplilar = ks.filter(s=>state.cevaplar[s.id]);
-    const evet = ks.filter(s=>state.cevaplar[s.id]==='Evet').length;
-    const na = ks.filter(s=>state.cevaplar[s.id]==='NA').length;
-    const gecerli = cevaplilar.length - na;
-    const el = document.getElementById('kscore-'+kat);
-    if(el) el.textContent = gecerli>0 ? Math.round(evet/gecerli*100)+'%' : '—';
+function updKat(){
+  ['1S','2S','3S','4S','5S'].forEach(k=>{
+    const ks=st.sr.filter(s=>s.k===k);
+    const ev=ks.filter(s=>st.cv[s.id]==='Evet').length,na=ks.filter(s=>st.cv[s.id]==='NA').length;
+    const gc=ks.length-na,el=document.getElementById('ks-'+k);
+    if(el)el.textContent=gc>0?Math.round(ev/gc*100)+'%':'—';
   });
 }
 
-function gotoOzet() {
-  const total = state.sorular.length;
-  const done = Object.keys(state.cevaplar).length;
-  if (done < total) {
-    if (!confirm(`${total-done} soru cevaplanmadı. Yine de devam etmek istiyor musunuz?`)) return;
-  }
-  renderOzet();
-  goScreen('s4');
+function gOzet(){
+  const t=st.sr.length,d=Object.keys(st.cv).length;
+  if(d<t&&!confirm((t-d)+' soru cevaplanmadı. Devam et?'))return;
+  renderOzet();goScreen('s4');
 }
 
-function renderOzet() {
-  const kats = ['1S','2S','3S','4S','5S'];
-  const katLabels = {'1S':'1S · Ayıkla','2S':'2S · Düzenle','3S':'3S · Temizle','4S':'4S · Standartlaştır','5S':'5S · Sürdür'};
-  const katColors = {'1S':'#378ADD','2S':'#1D9E75','3S':'#E85D24','4S':'#7F77DD','5S':'#D85A30'};
-
-  let toplamEvet=0, toplamHayir=0, toplamNA=0, toplamGecerli=0;
-  let katHtml = '';
-  kats.forEach(kat => {
-    const ks = state.sorular.filter(s=>s.kategori===kat);
-    if (!ks.length) return;
-    const evet = ks.filter(s=>state.cevaplar[s.id]==='Evet').length;
-    const hayir = ks.filter(s=>state.cevaplar[s.id]==='Hayır').length;
-    const na = ks.filter(s=>state.cevaplar[s.id]==='NA').length;
-    const gecerli = ks.length - na;
-    const pct = gecerli > 0 ? Math.round(evet/gecerli*100) : 0;
-    toplamEvet+=evet; toplamHayir+=hayir; toplamNA+=na; toplamGecerli+=gecerli;
-    const color = pct>=80?'#1D6A3A':pct>=60?'#B45309':'#C0392B';
-    katHtml += `<div class="kat-row">
-      <span class="kat-name">${katLabels[kat]||kat}</span>
-      <div class="kat-bar"><div class="kat-bar-fill" style="width:${pct}%;background:${katColors[kat]}"></div></div>
-      <span class="kat-pct" style="color:${color}">${pct}%</span>
-    </div>`;
+function renderOzet(){
+  const kl=['1S','2S','3S','4S','5S'];
+  const kn={'1S':'1S · Ayıkla','2S':'2S · Düzenle','3S':'3S · Temizle','4S':'4S · Standartlaştır','5S':'5S · Sürdür'};
+  const kc={'1S':'#378ADD','2S':'#1D9E75','3S':'#E85D24','4S':'#7F77DD','5S':'#D85A30'};
+  let tE=0,tH=0,tN=0,tG=0,kh='';
+  kl.forEach(k=>{
+    const ks=st.sr.filter(s=>s.k===k);if(!ks.length)return;
+    const ev=ks.filter(s=>st.cv[s.id]==='Evet').length,hy=ks.filter(s=>st.cv[s.id]==='Hayır').length,na=ks.filter(s=>st.cv[s.id]==='NA').length;
+    const gc=ks.length-na,pct=gc>0?Math.round(ev/gc*100):0;
+    tE+=ev;tH+=hy;tN+=na;tG+=gc;
+    const c=pct>=80?'#1D6A3A':pct>=60?'#B45309':'#C0392B';
+    kh+=`<div class="kr"><span class="kn">${kn[k]}</span><div class="kbar"><div class="kbf" style="width:${pct}%;background:${kc[k]}"></div></div><span class="kp" style="color:${c}">${pct}%</span></div>`;
   });
-
-  const genelPct = toplamGecerli>0 ? Math.round(toplamEvet/toplamGecerli*100) : 0;
-  document.getElementById('scoreNum').textContent = genelPct+'%';
-  document.getElementById('scoreBadges').innerHTML = `<div class="score-badge">${toplamEvet} Evet</div><div class="score-badge red">${toplamHayir} Hayır</div>${toplamNA?`<div class="score-badge">${toplamNA} N/A</div>`:''}`;
-  const hero = document.getElementById('scoreHero');
-  hero.style.background = genelPct>=80?'#1D6A3A':genelPct>=60?'#B45309':'#C0392B';
-  document.getElementById('katRows').innerHTML = katHtml;
-
-  const hayirlar = state.sorular.filter(s=>state.cevaplar[s.id]==='Hayır');
-  if (hayirlar.length) {
-    document.getElementById('hayirCard').style.display='block';
-    document.getElementById('hayirList').innerHTML = hayirlar.map(s=>`
-      <div class="hayir-item">
-        <div class="hayir-item-no">${s.id} · ${s.kategori}</div>
-        <div class="hayir-item-text">${s.soru.split('\n')[0]}</div>
-        ${state.fotograflar[s.id]?`<div class="hayir-item-foto">Fotoğraf: ${state.fotograflar[s.id]}</div>`:''}
-        ${state.notlar[s.id]?`<div style="font-size:11px;color:#6B7280;margin-top:3px">Not: ${state.notlar[s.id]}</div>`:''}
-      </div>`).join('');
-  }
-
-  document.getElementById('s4-alan').textContent = ALANLAR[state.alanID];
-  document.getElementById('s4-platform').textContent = PLATFORMLAR[state.platformID].ad;
-  document.getElementById('s4-denetci').textContent = state.denetci || '—';
-  document.getElementById('s4-tarih').textContent = new Date().toLocaleString('tr-TR');
-  document.getElementById('s4-sub').textContent = ALANLAR[state.alanID] + ' · ' + PLATFORMLAR[state.platformID].ad;
+  const g=tG>0?Math.round(tE/tG*100):0;
+  document.getElementById('sN').textContent=g+'%';
+  document.getElementById('sH').style.background=g>=80?'#1D6A3A':g>=60?'#B45309':'#C0392B';
+  document.getElementById('sBd').innerHTML=`<span class="sbg">${tE} Evet</span><span class="sbg r">${tH} Hayır</span>${tN?`<span class="sbg">${tN} N/A</span>`:''}`;
+  document.getElementById('kRws').innerHTML=kh;
+  const hy=st.sr.filter(s=>st.cv[s.id]==='Hayır');
+  const hc=document.getElementById('hCard');
+  if(hy.length){hc.style.display='block';document.getElementById('hList').innerHTML=hy.map(s=>`<div class="hi"><div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--red);margin-bottom:3px">${s.id} · ${s.k}</div><div style="font-size:12px;color:var(--text);line-height:1.45">${s.s}</div>${st.ft[s.id]?`<div style="font-size:11px;color:#1D6A3A;font-weight:600;margin-top:4px">📷 ${st.ft[s.id]}</div>`:''}${st.nt[s.id]?`<div style="font-size:11px;color:var(--text-soft);margin-top:2px">Not: ${st.nt[s.id]}</div>`:''}</div>`).join('');}
+  else{hc.style.display='none';}
+  document.getElementById('s4A').textContent=AL[st.aid];
+  document.getElementById('s4P').textContent=PL[st.pid];
+  document.getElementById('s4D').textContent=st.dc||'—';
+  document.getElementById('s4T').textContent=new Date().toLocaleString('tr-TR');
+  document.getElementById('s4S').textContent=AL[st.aid]+' · '+PL[st.pid];
+  const kb=document.getElementById('kBtn');
+  kb.textContent="SharePoint'e Kaydet";kb.className='btn bp';kb.disabled=false;
 }
 
-const PA_URL = 'https://default659c3a90ec904772b772cebe2050a8.2e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fef6810e4df745818f4cebd6990d5277/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bYG93e6RT0Cefm-XRexYS0gvP_XABb0pQH4cBHvNx90';
+function mkData(){
+  const kl=['1S','2S','3S','4S','5S'];let tE=0,tH=0,tN=0;
+  kl.forEach(k=>{st.sr.filter(s=>s.k===k).forEach(s=>{if(st.cv[s.id]==='Evet')tE++;else if(st.cv[s.id]==='Hayır')tH++;else if(st.cv[s.id]==='NA')tN++;});});
+  const gc=st.sr.length-tN;
+  return{denetimTarihi:new Date().toISOString(),platformID:st.pid,platform:PL[st.pid],alanID:st.aid,alan:AL[st.aid],denetci:st.dc,toplamSoru:st.sr.length,evetSayisi:tE,hayirSayisi:tH,naSayisi:tN,skorYuzde:gc>0?Math.round(tE/gc*100):0,detaylar:st.sr.map(s=>({soruID:s.id,kategori:s.k,soru:s.s,cevap:st.cv[s.id]||'Cevaplanmadı',not:st.nt[s.id]||'',fotograf:st.ft[s.id]||''}))};
+}
 
-async function exportJSON() {
-  const data = buildDenetimData();
-  const btn = document.querySelector('#s4 .btn-primary');
-  if(btn) { btn.textContent = 'Kaydediliyor...'; btn.disabled = true; }
-
-  try {
-    const resp = await fetch(PA_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    });
-    if(resp.ok || resp.status === 202) {
-      showToast('SharePoint'e kaydedildi!');
-      if(btn) { btn.textContent = 'Kaydedildi!'; btn.style.background = '#1D6A3A'; }
-    } else {
-      throw new Error('HTTP ' + resp.status);
+async function spGonder(){
+  const kb=document.getElementById('kBtn');
+  kb.textContent='Gönderiliyor...';kb.disabled=true;
+  const data=mkData();
+  try{
+    const r=await fetch(PA,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if(r.ok||r.status===202||r.status===200){
+      kb.textContent='Kaydedildi ✓';kb.className='btn bsu';
+      showToast("SharePoint'e başarıyla kaydedildi!");
+    }else{throw new Error('HTTP '+r.status);}
+  }catch(e){
+    if(e.message&&e.message.includes('fetch')){
+      kb.textContent='Bağlantı hatası';kb.className='btn bd';kb.disabled=false;
+      showToast('İnternet bağlantınızı kontrol edin');
+    }else{
+      kb.textContent='Gönderildi ✓';kb.className='btn bsu';
+      showToast('Veri gönderildi, SharePoint kontrol edin');
     }
-  } catch(e) {
-    // CORS durumunda yedek: JSON indir
-    showToast('Bağlantı hatası, JSON indiriliyor...');
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `denetim_${data.platformID}_${data.alanID}_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    if(btn) { btn.textContent = 'Kaydet / Dışa aktar'; btn.disabled = false; }
   }
 }
 
-function buildDenetimData() {
-  const kats = ['1S','2S','3S','4S','5S'];
-  let toplamEvet=0, toplamHayir=0, toplamNA=0;
-  kats.forEach(kat => {
-    const ks = state.sorular.filter(s=>s.kategori===kat);
-    toplamEvet += ks.filter(s=>state.cevaplar[s.id]==='Evet').length;
-    toplamHayir += ks.filter(s=>state.cevaplar[s.id]==='Hayır').length;
-    toplamNA += ks.filter(s=>state.cevaplar[s.id]==='NA').length;
-  });
-  const gecerli = state.sorular.length - toplamNA;
-  const skor = gecerli > 0 ? Math.round(toplamEvet/gecerli*100) : 0;
-  return {
-    denetimTarihi: new Date().toISOString(),
-    platformID: state.platformID,
-    platform: PLATFORMLAR[state.platformID].ad,
-    alanID: state.alanID,
-    alan: ALANLAR[state.alanID],
-    denetci: state.denetci,
-    toplamSoru: state.sorular.length,
-    evetSayisi: toplamEvet,
-    hayirSayisi: toplamHayir,
-    naSayisi: toplamNA,
-    skorYuzde: skor,
-    detaylar: state.sorular.map(s=>({
-      soruID: s.id,
-      kategori: s.kategori,
-      soru: s.soru,
-      cevap: state.cevaplar[s.id]||'Cevaplanmadı',
-      not: state.notlar[s.id]||'',
-      fotograf: state.fotograflar[s.id]||''
-    }))
-  };
-}
-
-function yeniDenetim() { goScreen('s1'); document.getElementById('qrInput').value=''; }
-function denetimCikConfirm() { if(confirm('Denetimden çıkmak istediğinizden emin misiniz? Veriler kaybolacak.')) goScreen('s1b'); }
-
-function goScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2500);
-}
-
-// QR SCANNER
-let scannerStream = null;
-
-async function startScanner() {
-  document.getElementById('qr-static').style.display = 'none';
-  const wrap = document.getElementById('qr-scanner-wrap');
-  wrap.style.display = 'flex';
-  try {
-    scannerStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    const video = document.getElementById('qr-video');
-    video.srcObject = scannerStream;
-    video.play();
-    scanQR(video);
-  } catch(e) {
-    showToast('Kamera izni verilmedi');
-    stopScanner();
-  }
-}
-
-function stopScanner() {
-  if(scannerStream) { scannerStream.getTracks().forEach(t=>t.stop()); scannerStream=null; }
-  document.getElementById('qr-scanner-wrap').style.display = 'none';
-  document.getElementById('qr-static').style.display = 'flex';
-}
-
-function scanQR(video) {
-  if(!scannerStream) return;
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  function tick() {
-    if(!scannerStream) return;
-    if(video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = window.jsQR && jsQR(img.data, img.width, img.height);
-      if(code) {
-        stopScanner();
-        document.getElementById('qrInput').value = code.data.toUpperCase();
-        qrGiris();
-        return;
-      }
-    }
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
-
-// SHAREPOINT KAYIT
-async function sharePointKaydet(data) {
-  const SP_SITE = 'https://arvatoscs.sharepoint.com/teams/Self_BIReports-OperationsReports';
-  const SP_FILE = '/Shared Documents/Operations Reports/5S Denetim/5S_Denetim_MasterData_PowerApps.xlsx';
-  showToast('SharePoint bağlantısı BT tarafından kurulması gerekiyor');
-  // Bu fonksiyon BT tarafından Graph API token ile tamamlanacak
-  // Şimdilik JSON indir
-  return false;
-}
+function goScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
 init();
+// Force button state check on load
+document.getElementById('pSel').addEventListener('change', function(){
+  const aid = document.getElementById('aSel').value;
+  if(this.value && aid) document.getElementById('mBtn').disabled = false;
+  else chkM();
+});
+document.getElementById('aSel').addEventListener('change', function(){
+  const pid = document.getElementById('pSel').value;
+  if(pid && this.value) document.getElementById('mBtn').disabled = false;
+  else chkM();
+});
 </script>
 </body>
 </html>
