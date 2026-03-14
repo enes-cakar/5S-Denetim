@@ -370,6 +370,7 @@ input, textarea, select {
 }
 input:focus, textarea:focus { border-color: var(--blue); background: #fff; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
 <body>
 
@@ -380,22 +381,30 @@ input:focus, textarea:focus { border-color: var(--blue); background: #fff; }
   <div class="topbar">
     <div class="topbar-info">
       <div class="topbar-title">5S Denetim Sistemi</div>
-      <div class="topbar-sub">Arvato · Kalite Yönetimi</div>
+      <div class="topbar-sub">Arvato · Lean Yönetimi & Operasyon Standardizasyonu</div>
     </div>
   </div>
   <div class="body">
-    <div class="qr-hero">
-      <div class="qr-frame">
-        <div class="qr-inner">
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span style="background:transparent"></span><span></span><span style="background:transparent"></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-          <span style="background:transparent"></span><span></span><span style="background:transparent"></span><span></span><span style="background:transparent"></span>
-          <span></span><span></span><span></span><span></span><span></span>
+    <div class="qr-hero" id="qrHero">
+      <div id="qr-scanner-wrap" style="width:100%;display:none;flex-direction:column;align-items:center;gap:12px">
+        <div style="position:relative;width:220px;height:220px;border-radius:16px;overflow:hidden;background:#000;flex-shrink:0">
+          <video id="qr-video" style="width:100%;height:100%;object-fit:cover" playsinline></video>
+          <div style="position:absolute;top:10px;left:10px;width:24px;height:24px;border-top:3px solid #378ADD;border-left:3px solid #378ADD;border-radius:3px 0 0 0"></div>
+          <div style="position:absolute;top:10px;right:10px;width:24px;height:24px;border-top:3px solid #378ADD;border-right:3px solid #378ADD;border-radius:0 3px 0 0"></div>
+          <div style="position:absolute;bottom:10px;left:10px;width:24px;height:24px;border-bottom:3px solid #378ADD;border-left:3px solid #378ADD;border-radius:0 0 0 3px"></div>
+          <div style="position:absolute;bottom:10px;right:10px;width:24px;height:24px;border-bottom:3px solid #378ADD;border-right:3px solid #378ADD;border-radius:0 0 3px 0"></div>
+          <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#378ADD,transparent);animation:scanline 2s linear infinite"></div>
         </div>
+        <div class="qr-hint">Kamerayı QR koda doğrultun</div>
+        <button class="btn btn-secondary" onclick="stopScanner()" style="width:auto;padding:8px 20px;font-size:13px">Kamerayı kapat</button>
       </div>
-      <div class="qr-hint">Denetim alanındaki QR kodu<br>okutun veya manuel giriş yapın</div>
+      <div id="qr-static" style="display:flex;flex-direction:column;align-items:center;gap:14px">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#0052A3" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1"/></svg>
+        <div class="qr-hint">Denetim alanındaki QR kodu<br>okutun veya manuel giriş yapın</div>
+        <button class="btn btn-primary" onclick="startScanner()" style="width:auto;padding:10px 24px">Kamerayı aç</button>
+      </div>
     </div>
+    <style>@keyframes scanline{0%{top:5%}100%{top:95%}}</style>
 
     <div class="card">
       <div class="card-label">Manuel giriş</div>
@@ -518,7 +527,7 @@ input:focus, textarea:focus { border-color: var(--blue); background: #fff; }
       <div class="info-row"><span class="info-key">Tarih</span><span class="info-val" id="s4-tarih"></span></div>
     </div>
 
-    <button class="btn btn-primary" onclick="exportJSON()">Dışa aktar (JSON)</button>
+    <button class="btn btn-primary" onclick="exportJSON()">Kaydet / Dışa aktar</button>
     <button class="btn btn-secondary" onclick="yeniDenetim()" style="margin-top:-4px">Yeni denetim</button>
   </div>
 </div>
@@ -793,24 +802,69 @@ function renderOzet() {
   document.getElementById('s4-sub').textContent = ALANLAR[state.alanID] + ' · ' + PLATFORMLAR[state.platformID].ad;
 }
 
-function exportJSON() {
-  const data = {
-    tarih: new Date().toISOString(),
+const PA_URL = 'https://default659c3a90ec904772b772cebe2050a8.2e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fef6810e4df745818f4cebd6990d5277/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bYG93e6RT0Cefm-XRexYS0gvP_XABb0pQH4cBHvNx90';
+
+async function exportJSON() {
+  const data = buildDenetimData();
+  const btn = document.querySelector('#s4 .btn-primary');
+  if(btn) { btn.textContent = 'Kaydediliyor...'; btn.disabled = true; }
+
+  try {
+    const resp = await fetch(PA_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+    if(resp.ok || resp.status === 202) {
+      showToast('SharePoint'e kaydedildi!');
+      if(btn) { btn.textContent = 'Kaydedildi!'; btn.style.background = '#1D6A3A'; }
+    } else {
+      throw new Error('HTTP ' + resp.status);
+    }
+  } catch(e) {
+    // CORS durumunda yedek: JSON indir
+    showToast('Bağlantı hatası, JSON indiriliyor...');
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `denetim_${data.platformID}_${data.alanID}_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    if(btn) { btn.textContent = 'Kaydet / Dışa aktar'; btn.disabled = false; }
+  }
+}
+
+function buildDenetimData() {
+  const kats = ['1S','2S','3S','4S','5S'];
+  let toplamEvet=0, toplamHayir=0, toplamNA=0;
+  kats.forEach(kat => {
+    const ks = state.sorular.filter(s=>s.kategori===kat);
+    toplamEvet += ks.filter(s=>state.cevaplar[s.id]==='Evet').length;
+    toplamHayir += ks.filter(s=>state.cevaplar[s.id]==='Hayır').length;
+    toplamNA += ks.filter(s=>state.cevaplar[s.id]==='NA').length;
+  });
+  const gecerli = state.sorular.length - toplamNA;
+  const skor = gecerli > 0 ? Math.round(toplamEvet/gecerli*100) : 0;
+  return {
+    denetimTarihi: new Date().toISOString(),
     platformID: state.platformID,
     platform: PLATFORMLAR[state.platformID].ad,
     alanID: state.alanID,
     alan: ALANLAR[state.alanID],
     denetci: state.denetci,
-    cevaplar: state.cevaplar,
-    notlar: state.notlar,
-    fotograflar: state.fotograflar
+    toplamSoru: state.sorular.length,
+    evetSayisi: toplamEvet,
+    hayirSayisi: toplamHayir,
+    naSayisi: toplamNA,
+    skorYuzde: skor,
+    detaylar: state.sorular.map(s=>({
+      soruID: s.id,
+      kategori: s.kategori,
+      soru: s.soru,
+      cevap: state.cevaplar[s.id]||'Cevaplanmadı',
+      not: state.notlar[s.id]||'',
+      fotograf: state.fotograflar[s.id]||''
+    }))
   };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `denetim_${state.platformID}_${state.alanID}_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  showToast('JSON indirildi!');
 }
 
 function yeniDenetim() { goScreen('s1'); document.getElementById('qrInput').value=''; }
@@ -826,6 +880,65 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// QR SCANNER
+let scannerStream = null;
+
+async function startScanner() {
+  document.getElementById('qr-static').style.display = 'none';
+  const wrap = document.getElementById('qr-scanner-wrap');
+  wrap.style.display = 'flex';
+  try {
+    scannerStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const video = document.getElementById('qr-video');
+    video.srcObject = scannerStream;
+    video.play();
+    scanQR(video);
+  } catch(e) {
+    showToast('Kamera izni verilmedi');
+    stopScanner();
+  }
+}
+
+function stopScanner() {
+  if(scannerStream) { scannerStream.getTracks().forEach(t=>t.stop()); scannerStream=null; }
+  document.getElementById('qr-scanner-wrap').style.display = 'none';
+  document.getElementById('qr-static').style.display = 'flex';
+}
+
+function scanQR(video) {
+  if(!scannerStream) return;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  function tick() {
+    if(!scannerStream) return;
+    if(video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = window.jsQR && jsQR(img.data, img.width, img.height);
+      if(code) {
+        stopScanner();
+        document.getElementById('qrInput').value = code.data.toUpperCase();
+        qrGiris();
+        return;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// SHAREPOINT KAYIT
+async function sharePointKaydet(data) {
+  const SP_SITE = 'https://arvatoscs.sharepoint.com/teams/Self_BIReports-OperationsReports';
+  const SP_FILE = '/Shared Documents/Operations Reports/5S Denetim/5S_Denetim_MasterData_PowerApps.xlsx';
+  showToast('SharePoint bağlantısı BT tarafından kurulması gerekiyor');
+  // Bu fonksiyon BT tarafından Graph API token ile tamamlanacak
+  // Şimdilik JSON indir
+  return false;
 }
 
 init();
