@@ -519,7 +519,7 @@ function renderOzet(){
     const gc=ks.length-na,pct=gc>0?Math.round(ev/gc*100):0;
     tE+=ev;tH+=hy;tN+=na;tG+=gc;
     const c=pct>=80?'#1D6A3A':pct>=60?'#B45309':'#C0392B';
-    kh+=`<div class="kr"><span class="kn">${kn[k]}</span><div class="kbar"><div class="kbf" style="width:${pct}%;background:${kc[k]}"></div></div><span class="kp" style="color:${c}">${pct}%</span></div>`;
+    kh+=`<div class="kat-row"><span class="kat-name">${kn[k]}</span><div class="kat-bar-wrap"><div class="kat-bar-fill" style="width:${pct}%;background:${kc[k]}"></div></div><span class="kat-pct" style="color:${c}">${pct}%</span></div>`;
   });
   const g=tG>0?Math.round(tE/tG*100):0;
   document.getElementById('sN').textContent=g+'%';
@@ -530,13 +530,13 @@ function renderOzet(){
   const hc=document.getElementById('hCard');
   if(hy.length){hc.style.display='block';document.getElementById('hList').innerHTML=hy.map(s=>`<div class="hi"><div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--red);margin-bottom:3px">${s.id} · ${s.k}</div><div style="font-size:12px;color:var(--text);line-height:1.45">${s.s}</div>${st.ft[s.id]?`<div style="font-size:11px;color:#1D6A3A;font-weight:600;margin-top:4px">📷 ${st.ft[s.id]}</div>`:''}${st.nt[s.id]?`<div style="font-size:11px;color:var(--text-soft);margin-top:2px">Not: ${st.nt[s.id]}</div>`:''}</div>`).join('');}
   else{hc.style.display='none';}
-  document.getElementById('s4A').textContent=AL[st.aid];
-  document.getElementById('s4P').textContent=PL[st.pid];
-  document.getElementById('s4D').textContent=st.dc||'—';
-  document.getElementById('s4T').textContent=new Date().toLocaleString('tr-TR');
+  document.getElementById('i-alan').textContent=AL[st.aid];
+  document.getElementById('i-plat').textContent=PL[st.pid];
+  document.getElementById('i-dnt').textContent=st.dc||'—';
+  document.getElementById('i-tarih').textContent=new Date().toLocaleString('tr-TR');
   document.getElementById('s4S').textContent=AL[st.aid]+' · '+PL[st.pid];
   const kb=document.getElementById('kBtn');
-  kb.textContent="SharePoint'e Kaydet";kb.className='btn bp';kb.disabled=false;
+  kb.textContent="SharePoint'e Kaydet";kb.className='btn btn-success';kb.disabled=false;
 }
 
 function mkData(){
@@ -553,21 +553,29 @@ async function spGonder(){
   try{
     const r=await fetch(PA,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     if(r.ok||r.status===202||r.status===200){
-      kb.textContent='Kaydedildi ✓';kb.className='btn bsu';
+      kb.textContent='Kaydedildi ✓';kb.className='btn btn-success';
       showToast("SharePoint'e başarıyla kaydedildi!");
     }else{throw new Error('HTTP '+r.status);}
   }catch(e){
     if(e.message&&e.message.includes('fetch')){
-      kb.textContent='Bağlantı hatası';kb.className='btn bd';kb.disabled=false;
+      kb.textContent='Bağlantı hatası';kb.className='btn btn-danger';kb.disabled=false;
       showToast('İnternet bağlantınızı kontrol edin');
     }else{
-      kb.textContent='Gönderildi ✓';kb.className='btn bsu';
+      kb.textContent='Gönderildi ✓';kb.className='btn btn-success';
       showToast('Veri gönderildi, SharePoint kontrol edin');
     }
   }
 }
 
 function cikConfirm(){if(confirm('Denetimden çıkmak istediğinizden emin misiniz?'))goScreen('s1');}
+
+function yeniDenetim(){
+  st={pid:null,aid:null,dc:'',sr:[],cv:{},nt:{},ft:{},fb:{},as:null};
+  document.getElementById('qrM').value='';
+  document.getElementById('pSel').value='';
+  document.getElementById('aSel').value='';
+  goScreen('s1');
+}
 
 function goScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
