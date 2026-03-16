@@ -274,8 +274,8 @@ select{-webkit-appearance:none;appearance:none;background-image:url("data:image/
     <div id="s3FA"></div>
     <input type="file" id="fK" accept="image/*" style="display:none" onchange="fSec(this)">
     <input type="file" id="fG" accept="image/*" style="display:none" onchange="fSec(this)">
-    <button class="btn btn-primary" onclick="fKaydet()">Kaydet ve Geri Dön</button>
-    <button class="btn btn-secondary" onclick="goScreen('s2')" style="margin-top:-2px">Fotoğrafsız Devam Et</button>
+    <button class="btn btn-primary" id="kaydetBtn" onclick="fKaydet()">Kaydet ve Geri Dön</button>
+    <button class="btn btn-secondary" onclick="goScreen('s2')" style="margin-top:-2px">Geri Dön</button>
   </div>
 </div>
 
@@ -447,7 +447,7 @@ function cv(sid,c){
   const ex=document.getElementById('ex-'+sid);
   if(c==='Hayır'){
     const hf=!!st.ft[sid];
-    ex.innerHTML=`<div class="foto-mini" onclick="acF('${sid}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${hf?'#1D6A3A':'#C0392B'}" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span style="font-size:12px;color:${hf?'#1D6A3A':'#C0392B'};font-weight:500">${hf?'Fotoğraf eklendi ✓':'Fotoğraf ekle (zorunlu)'}</span></div><textarea style="margin-top:8px;font-size:12px;min-height:36px" placeholder="Not ekle..." onchange="st.nt['${sid}']=this.value">${st.nt[sid]||''}</textarea>`;
+    ex.innerHTML=`<div class="foto-mini" onclick="acF('${sid}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${hf?'#1D6A3A':'#C0392B'}" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span style="font-size:12px;color:${hf?'#1D6A3A':'#C0392B'};font-weight:500">${hf?'📷 Fotoğraf eklendi ✓ ✓':'📷 Fotoğraf ekle — ZORUNLU'}</span></div><textarea style="margin-top:8px;font-size:12px;min-height:36px" placeholder="Not ekle..." onchange="st.nt['${sid}']=this.value">${st.nt[sid]||''}</textarea>`;
   }else{ex.innerHTML='';}
   updBadge();updKat();
 }
@@ -460,10 +460,23 @@ function acF(sid){
   document.getElementById('s3N').value=st.nt[sid]||'';
   const hf=st.ft[sid];
   document.getElementById('s3FA').innerHTML=hf
-    ?`<div style="background:#F0FDF4;border:2px solid #86EFAC;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px"><div style="width:32px;height:32px;background:#E6F5EC;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6A3A" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#1D6A3A">Fotoğraf eklendi</div><div style="font-size:11px;color:var(--text-soft)">${hf}</div></div></div>`
+    ?`<div style="background:#F0FDF4;border:2px solid #86EFAC;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px"><div style="width:32px;height:32px;background:#E6F5EC;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6A3A" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#1D6A3A">📷 Fotoğraf eklendi ✓</div><div style="font-size:11px;color:var(--text-soft)">${hf}</div></div></div>`
     :'';
   document.getElementById('s3FA').innerHTML+=`<button class="fc-btn" onclick="document.getElementById('fK').click()"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span style="font-size:15px;font-weight:600">Kamera ile çek</span><span style="font-size:12px;opacity:.8">Anlık fotoğraf için dokunun</span></button><div style="display:flex;align-items:center;gap:8px;margin:8px 0"><div style="flex:1;height:1px;background:var(--gray-mid)"></div><span style="font-size:12px;color:var(--text-soft)">veya</span><div style="flex:1;height:1px;background:var(--gray-mid)"></div></div><button class="fg-btn" onclick="document.getElementById('fG').click()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Galeriden seç</button>`;
   goScreen('s3');
+  // Kaydet butonunu fotoğraf durumuna göre ayarla
+  setTimeout(()=>{
+    const kb=document.getElementById('kaydetBtn');
+    if(kb && st.cv[sid]==='Hayır'){
+      if(!st.ft[sid]&&!st.fb[sid]){
+        kb.style.opacity='0.5';
+        kb.title='Önce fotoğraf eklemelisiniz';
+      } else {
+        kb.style.opacity='1';
+        kb.title='';
+      }
+    }
+  },100);
 }
 
 function fSec(inp){
@@ -474,14 +487,28 @@ function fSec(inp){
     reader.onload=function(e){
       // Strip data:image/...;base64, prefix
       st.fb[st.as]=e.target.result.split(',')[1];
-      showToast('Fotoğraf eklendi: '+file.name);
+      showToast('📷 Fotoğraf eklendi ✓: '+file.name);
     };
     reader.readAsDataURL(file);
   }
 }
 
+function fotosuzDevam(){
+  // Eğer cevap Hayır ise fotoğrafsız geçmeye izin verme
+  if(st.cv[st.as]==='Hayır'){
+    showToast('Hayır cevabı için fotoğraf zorunludur!');
+    return;
+  }
+  st.nt[st.as]=document.getElementById('s3N').value;
+  goScreen('s2');
+}
+
 function fKaydet(){
   st.nt[st.as]=document.getElementById('s3N').value;
+  if(st.cv[st.as]==='Hayır' && !st.fb[st.as] && !st.ft[st.as]){
+    showToast('Fotoğraf zorunlu! Lütfen fotoğraf ekleyin.');
+    return;
+  }
   if(st.cv[st.as]==='Hayır')cv(st.as,'Hayır');
   goScreen('s2');showToast('Kaydedildi!');
 }
@@ -504,7 +531,26 @@ function updKat(){
 
 function gOzet(){
   const t=st.sr.length,d=Object.keys(st.cv).length;
+  
+  // Fotoğrafsız hayır kontrolü
+  const fotoEksik=st.sr.filter(s=>st.cv[s.id]==='Hayır'&&!st.ft[s.id]&&!st.fb[s.id]);
+  if(fotoEksik.length>0){
+    const ilk=fotoEksik[0];
+    showToast(fotoEksik.length+' maddede fotoğraf eksik!');
+    // İlk eksik maddeye scroll et
+    setTimeout(()=>{
+      const el=document.getElementById('sc-'+ilk.id);
+      if(el){el.scrollIntoView({behavior:'smooth',block:'center'});
+        el.style.outline='2px solid #B91C1C';
+        setTimeout(()=>el.style.outline='',2000);
+      }
+    },300);
+    return;
+  }
+  
+  // Cevaplanmamış soru kontrolü
   if(d<t&&!confirm((t-d)+' soru cevaplanmadı. Devam et?'))return;
+  
   renderOzet();goScreen('s4');
 }
 
