@@ -3,176 +3,327 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>5S Denetim v3</title>
+<title>5S Denetim — Arvato</title>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--blue:#0052A3;--blue-dark:#003d7a;--blue-light:#E6F1FB;--green:#1D6A3A;--green-light:#E6F5EC;--red:#C0392B;--red-light:#FDECEA;--amber:#B45309;--gray:#F5F6F8;--gray-mid:#E2E5EA;--text:#111827;--text-soft:#6B7280;--white:#FFFFFF;--r:14px;--rs:8px}
+:root{
+  --arvato:#0078BE;
+  --arvato-dark:#005A8E;
+  --arvato-light:#E6F3FB;
+  --arvato-mid:#3399CC;
+  --green:#15803D;--green-light:#DCFCE7;--green-mid:#86EFAC;
+  --red:#B91C1C;--red-light:#FEF0EE;--red-mid:#FCA5A5;
+  --amber:#B45309;--amber-light:#FEF3C7;
+  --text:#0D1F2D;--text-soft:#64748B;--text-hint:#94A3B8;
+  --bg:#F0F4F8;--surface:#FFFFFF;--border:#DDE3EC;--border-light:#EEF1F5;
+  --r:12px;--rs:8px;
+  --shadow:0 1px 3px rgba(0,40,100,.08),0 4px 12px rgba(0,40,100,.05);
+  --shadow-md:0 4px 20px rgba(0,40,100,.12),0 1px 4px rgba(0,40,100,.06);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:"DM Sans",sans-serif;background:#EAECF0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px 0 40px}
-.app{width:100%;max-width:420px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.15);min-height:700px;display:flex;flex-direction:column}
-.screen{display:none;flex-direction:column;flex:1}.screen.active{display:flex}
-.topbar{background:var(--blue);padding:16px 18px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.bk{width:32px;height:32px;border:none;background:rgba(255,255,255,.15);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ti{flex:1;min-width:0}.tt{font-size:15px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ts{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
-.tbadge{background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:99px;flex-shrink:0;font-family:"DM Mono",monospace}
-.body{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
-.card{background:#fff;border:1px solid var(--gray-mid);border-radius:var(--r);padding:14px 16px}
-.cl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
-input,textarea,select{font-family:"DM Sans",sans-serif;font-size:13px;color:var(--text);background:var(--gray);border:1px solid var(--gray-mid);border-radius:var(--rs);padding:10px 12px;width:100%;outline:none;transition:border-color .15s}
-input:focus,textarea:focus,select:focus{border-color:var(--blue);background:#fff}
-select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
-.btn{width:100%;padding:14px;border-radius:var(--rs);font-family:"DM Sans",sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
-.bp{background:var(--blue);color:#fff}.bp:hover{background:var(--blue-dark)}.bp:active{transform:scale(.98)}.bp:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.bs{background:var(--gray);color:var(--text);border:1px solid var(--gray-mid)}
-.bsu{background:var(--green);color:#fff}
-.bd{background:var(--red);color:#fff}
-.qr-hero{background:var(--blue-light);border-radius:var(--r);padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:14px;border:1px solid #C5DDF6}
-.qvw{position:relative;width:240px;height:240px;border-radius:16px;overflow:hidden;background:#000;flex-shrink:0}
-.qvw video{width:100%;height:100%;object-fit:cover}
-.qc{position:absolute;width:24px;height:24px;border-color:#378ADD;border-style:solid}
-.qc.tl{top:8px;left:8px;border-width:3px 0 0 3px;border-radius:3px 0 0 0}
-.qc.tr{top:8px;right:8px;border-width:3px 3px 0 0;border-radius:0 3px 0 0}
-.qc.bl{bottom:8px;left:8px;border-width:0 0 3px 3px;border-radius:0 0 0 3px}
-.qc.br{bottom:8px;right:8px;border-width:0 3px 3px 0;border-radius:0 0 3px 0}
-.sl{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#378ADD,transparent);animation:sc 2s linear infinite}
-@keyframes sc{0%{top:8%}100%{top:92%}}
-.qhint{font-size:13px;color:var(--text-soft);text-align:center;line-height:1.5}
-.ag{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.ab{background:var(--gray);border:1.5px solid var(--gray-mid);border-radius:var(--rs);padding:10px 12px;font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;text-align:left;transition:all .15s}
-.ab:hover{border-color:var(--blue);background:var(--blue-light)}.ab.sel{border-color:var(--blue);background:var(--blue-light);color:var(--blue)}
-.aid{font-size:10px;font-family:"DM Mono",monospace;color:var(--text-soft);margin-bottom:2px}
-.pb{background:var(--gray-mid);border-radius:99px;height:5px}.pf{background:var(--blue);height:100%;border-radius:99px;transition:width .4s}
-.kh{border-radius:var(--rs);padding:8px 12px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;display:flex;justify-content:space-between;color:#fff}
-.sc{background:#fff;border:1px solid var(--gray-mid);border-radius:var(--r);padding:14px;transition:border-color .2s,background .2s}
-.sc.ae{border-color:#86EFAC;background:#F0FDF4}.sc.ah{border-color:#FCA5A5;background:#FFF5F5}.sc.an{border-color:#D1D5DB;background:#F9FAFB}
-.sm{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
-.sn{font-size:10px;font-weight:600;font-family:"DM Mono",monospace;background:var(--blue-light);color:var(--blue);padding:2px 7px;border-radius:99px}
-.kb{font-size:10px;font-weight:600;background:var(--red-light);color:var(--red);padding:2px 7px;border-radius:99px}
-.st{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:12px;white-space:pre-line}
-.cr{display:flex;gap:6px}
-.cb{flex:1;padding:9px 4px;border-radius:8px;font-family:"DM Sans",sans-serif;font-size:12px;font-weight:600;border:1.5px solid var(--gray-mid);background:var(--gray);color:var(--text-soft);cursor:pointer;text-align:center;transition:all .15s}
-.cb.ce{border-color:#1D6A3A;background:#E6F5EC;color:#1D6A3A}
-.cb.ch{border-color:var(--red);background:var(--red-light);color:var(--red)}
-.cb.cn{border-color:#9CA3AF;background:#F3F4F6;color:#374151}
-.fp{margin-top:10px;border:1.5px dashed #FCA5A5;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--red-light)}
-.fc-btn{background:var(--red);color:#fff;border:none;border-radius:var(--r);padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;width:100%}
-.fg-btn{background:var(--gray);color:var(--text);border:1px solid var(--gray-mid);border-radius:var(--r);padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;width:100%;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:500}
-.sh{border-radius:var(--r);padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:6px}
-.sn2{font-size:52px;font-weight:600;color:#fff;font-family:"DM Mono",monospace;line-height:1}
-.sl2{font-size:13px;color:rgba(255,255,255,.7)}
-.sbd{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;justify-content:center}
-.sbg{background:rgba(255,255,255,.2);color:#fff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:99px}
-.sbg.r{background:rgba(239,68,68,.35)}
-.kr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray-mid)}.kr:last-child{border-bottom:none}
-.kn{font-size:13px;color:var(--text);flex:1}
-.kbar{flex:2;background:var(--gray-mid);border-radius:99px;height:6px}
-.kbf{height:100%;border-radius:99px}
-.kp{font-size:12px;font-weight:600;font-family:"DM Mono",monospace;min-width:36px;text-align:right}
-.hi{padding:10px 14px;border-radius:var(--rs);background:var(--red-light);border:1px solid #FCA5A5;margin-bottom:6px}
-.hi:last-child{margin-bottom:0}
-.ir{display:flex;justify-content:space-between;align-items:center;padding:7px 0}.ir+.ir{border-top:1px solid var(--gray-mid)}
-.ik{font-size:12px;color:var(--text-soft)}.iv{font-size:12px;font-weight:600;color:var(--text)}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:99px;transition:transform .3s;z-index:999;white-space:nowrap;max-width:90vw;text-align:center}
-.toast.show{transform:translateX(-50%) translateY(0)}
+body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:0}
+.app{width:100%;max-width:430px;min-height:100vh;background:var(--surface);display:flex;flex-direction:column;position:relative}
+@media(min-width:500px){
+  body{padding:24px 0 48px;background:#1A2E44}
+  .app{min-height:700px;border-radius:24px;box-shadow:0 32px 80px rgba(0,0,0,.3),0 8px 32px rgba(0,0,0,.2)}
+}
+
+/* SCREENS */
+.screen{display:none;flex-direction:column;flex:1;animation:fu .2s ease}
+.screen.active{display:flex}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* TOPBAR */
+.topbar{background:var(--arvato);padding:14px 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.arvato-logo{background:#fff;border-radius:6px;padding:5px 11px;display:inline-flex;align-items:center;flex-shrink:0}
+.arvato-logo span{font-size:14px;font-weight:700;color:var(--arvato);letter-spacing:-.5px;font-family:'Inter',sans-serif}
+.topbar-back{width:32px;height:32px;background:rgba(255,255,255,.15);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.topbar-back:hover{background:rgba(255,255,255,.25)}
+.topbar-info{flex:1;min-width:0}
+.topbar-title{font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-sub{font-size:10px;color:rgba(255,255,255,.6);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-badge{background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+
+/* BODY */
+.body{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;background:var(--bg)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.card-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-soft);margin-bottom:10px}
+
+/* SCREEN 1 — GİRİŞ */
+.splash{background:var(--arvato);padding:28px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;border-radius:0 0 20px 20px;margin-bottom:4px}
+.splash-logo{background:#fff;border-radius:10px;padding:10px 22px}
+.splash-logo span{font-size:22px;font-weight:700;color:var(--arvato);letter-spacing:-.8px}
+.splash-title{font-size:15px;font-weight:600;color:#fff;text-align:center}
+.splash-sub{font-size:11px;color:rgba(255,255,255,.6);text-align:center;line-height:1.5}
+
+.qr-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.qr-static{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.qr-icon{width:72px;height:72px;background:var(--arvato-light);border-radius:14px;display:flex;align-items:center;justify-content:center;border:2px solid #C5DDF6}
+.qr-hint{font-size:12px;color:var(--text-soft);text-align:center;line-height:1.6}
+.qr-video-wrap{position:relative;width:220px;height:220px;border-radius:14px;overflow:hidden;background:#000;flex-shrink:0}
+.qr-video-wrap video{width:100%;height:100%;object-fit:cover}
+.qr-corner{position:absolute;width:22px;height:22px;border-color:var(--arvato-mid);border-style:solid}
+.qr-corner.tl{top:8px;left:8px;border-width:3px 0 0 3px;border-radius:3px 0 0 0}
+.qr-corner.tr{top:8px;right:8px;border-width:3px 3px 0 0;border-radius:0 3px 0 0}
+.qr-corner.bl{bottom:8px;left:8px;border-width:0 0 3px 3px;border-radius:0 0 0 3px}
+.qr-corner.br{bottom:8px;right:8px;border-width:0 3px 3px 0;border-radius:0 0 3px 0}
+.qr-scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--arvato-mid),transparent);animation:scan 2s linear infinite}
+@keyframes scan{0%{top:5%}100%{top:95%}}
+
+/* PLATFORM / ALAN */
+.platform-list{display:flex;flex-direction:column;gap:6px}
+.platform-btn{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:all .15s}
+.platform-btn:hover{border-color:var(--arvato);background:var(--arvato-light)}
+.platform-btn .pid{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-hint)}
+.alan-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ab{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--text);cursor:pointer;text-align:left;transition:all .15s}
+.ab:hover{border-color:var(--arvato);background:var(--arvato-light)}
+.ab.sel{border-color:var(--arvato);background:var(--arvato-light);color:var(--arvato)}
+.ab .aid{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text-hint);margin-bottom:2px}
+
+/* SCREEN 2 — FORM */
+.progress-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow)}
+.progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.progress-label{font-size:11px;color:var(--text-soft)}
+.progress-count{font-size:11px;font-weight:700;color:var(--arvato);font-family:'JetBrains Mono',monospace}
+.progress-bar{background:var(--border);border-radius:99px;height:5px}
+.progress-fill{background:var(--arvato);height:100%;border-radius:99px;transition:width .5s ease}
+
+.kat-header{border-radius:var(--rs);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:2px}
+.kat-header span{font-size:10px;font-weight:700;letter-spacing:.7px;color:#fff}
+.kat-header .ks{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.65)}
+
+.soru-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:all .2s;box-shadow:var(--shadow)}
+.soru-card.ae{border-color:var(--green-mid);background:#F0FDF4}
+.soru-card.ah{border-color:var(--red-mid);background:var(--red-light)}
+.soru-card.an{border-color:#D1D5DB;background:#F9FAFB}
+.soru-meta{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.soru-id{font-size:9px;font-weight:700;background:var(--arvato-light);color:var(--arvato);padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace}
+.kritik-tag{font-size:9px;font-weight:600;background:#FEF0EE;color:var(--red);padding:2px 7px;border-radius:4px}
+.soru-text{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:12px;white-space:pre-line}
+.cevap-row{display:flex;gap:5px}
+.cevap-btn{flex:1;padding:9px 4px;border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--bg);color:var(--text-soft);cursor:pointer;text-align:center;transition:all .15s}
+.cevap-btn:hover{transform:translateY(-1px)}
+.cevap-btn.ae{border-color:var(--green);background:var(--green-light);color:var(--green)}
+.cevap-btn.ah{border-color:var(--red);background:var(--red-light);color:var(--red)}
+.cevap-btn.an{border-color:#9CA3AF;background:#F3F4F6;color:#374151}
+
+.foto-mini{margin-top:10px;background:var(--red-light);border:1px dashed var(--red-mid);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s}
+.foto-mini:hover{border-color:var(--red)}
+.foto-mini span{font-size:11px;color:var(--red);font-weight:500}
+.foto-mini .foto-ok{color:var(--green);font-weight:600}
+
+/* SCREEN 3 — FOTO */
+.foto-upload{border:2px dashed var(--red-mid);border-radius:var(--r);padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;background:var(--red-light);cursor:pointer;transition:all .2s}
+.foto-upload:hover{border-color:var(--red)}
+.foto-upload-icon{width:52px;height:52px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--red-mid)}
+.foto-preview{background:#F0FDF4;border:2px solid var(--green-mid);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.foto-check{width:32px;height:32px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fc-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:var(--rs);padding:13px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.fc-btn:hover{background:#991B1B}
+.fg-btn{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:var(--rs);padding:11px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.fg-btn:hover{border-color:var(--arvato)}
+
+/* SCREEN 4 — ÖZET */
+.score-hero{border-radius:var(--r);padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;overflow:hidden}
+.score-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.08)}
+.score-hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.06)}
+.score-num{font-size:64px;font-weight:700;color:#fff;line-height:1;font-family:'JetBrains Mono',monospace;position:relative;z-index:1}
+.score-label{font-size:12px;color:rgba(255,255,255,.65);position:relative;z-index:1}
+.score-badges{display:flex;gap:8px;margin-top:6px;position:relative;z-index:1}
+.score-badge{background:rgba(255,255,255,.18);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px}
+.score-badge.red{background:rgba(239,68,68,.35)}
+
+.kat-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border-light)}
+.kat-row:last-child{border-bottom:none}
+.kat-name{font-size:12px;color:var(--text);flex:1}
+.kat-bar-wrap{flex:2;background:var(--border);border-radius:99px;height:6px;overflow:hidden}
+.kat-bar-fill{height:100%;border-radius:99px;background:var(--arvato);transition:width .6s ease}
+.kat-pct{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:38px;text-align:right}
+
+.hayir-item{padding:11px 14px;border-radius:var(--rs);background:var(--red-light);border:1px solid var(--red-mid);border-left:3px solid var(--red);margin-bottom:7px}
+.hayir-item:last-child{margin-bottom:0}
+.hayir-no{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--red);margin-bottom:3px;font-weight:700}
+.hayir-text{font-size:12px;color:var(--text);line-height:1.45}
+.hayir-foto{font-size:10px;color:var(--green);font-weight:600;margin-top:4px}
+
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light)}
+.info-row:last-child{border-bottom:none}
+.info-key{font-size:12px;color:var(--text-soft)}
+.info-val{font-size:12px;font-weight:600;color:var(--text)}
+
+/* BUTTONS */
+.btn{width:100%;padding:14px;border-radius:var(--rs);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .15s;letter-spacing:.1px}
+.btn-primary{background:var(--arvato);color:#fff;box-shadow:0 4px 12px rgba(0,120,190,.3)}
+.btn-primary:hover{background:var(--arvato-dark);box-shadow:0 6px 16px rgba(0,120,190,.4)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--arvato);color:var(--arvato)}
+.btn-success{background:#15803D;color:#fff;box-shadow:0 4px 12px rgba(21,128,61,.3)}
+.btn-success:hover{background:#166534}
+.btn-danger{background:var(--red);color:#fff}
+
+input,textarea,select{font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:11px 13px;width:100%;outline:none;transition:all .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--arvato);background:#fff;box-shadow:0 0 0 3px rgba(0,120,190,.1)}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#0D1F2D;color:#fff;font-size:13px;font-weight:500;padding:12px 22px;border-radius:99px;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:100;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#toast.show{transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 <div class="app">
 
+<!-- S1: GİRİŞ -->
 <div class="screen active" id="s1">
-  <div class="topbar">
-    <div class="ti"><div class="tt">5S Denetim Sistemi</div><div class="ts">Arvato &middot; Lean Y&ouml;netimi &amp; Operasyon Standardizasyonu</div></div>
+  <div class="splash">
+    <div class="splash-logo"><span>arvato</span></div>
+    <div class="splash-title">5S Denetim Sistemi</div>
+    <div class="splash-sub">Lean Yönetimi &amp; Operasyon Standardizasyonu</div>
   </div>
-  <div class="body">
-    <div class="qr-hero">
-      <div id="qrS" style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%">
-        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#0052A3" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1"/></svg>
-        <div class="qhint">QR kodu okutun veya<br>a&#351;a&#287;&#305;dan se&#231;in / girin</div>
-        <button class="btn bp" style="width:auto;padding:10px 28px" onclick="startQR()">Kameras&#305;n&#305; a&#231;</button>
+  <div class="body" style="margin-top:-10px">
+    <div class="qr-wrap">
+      <div class="qr-static" id="qrS">
+        <div class="qr-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0078BE" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3m0 4h4m-4 0v-4m-3 4h-1"/></svg>
+        </div>
+        <div class="qr-hint">QR kodu okutun veya<br>aşağıdan platform ve alan seçin</div>
+        <button class="btn btn-primary" style="width:auto;padding:10px 28px" onclick="startQR()">Kamerayı aç</button>
       </div>
-      <div id="qrV" style="display:none;flex-direction:column;align-items:center;gap:12px;width:100%">
-        <div class="qvw"><video id="qrVid" playsinline autoplay muted></video><div class="qc tl"></div><div class="qc tr"></div><div class="qc bl"></div><div class="qc br"></div><div class="sl"></div></div>
-        <div class="qhint">Kameray&#305; QR koda do&#287;rultun</div>
-        <button class="btn bs" style="width:auto;padding:8px 20px;font-size:13px" onclick="stopQR()">Kapat</button>
+      <div style="display:none;flex-direction:column;align-items:center;gap:12px;width:100%" id="qrV">
+        <div class="qr-video-wrap">
+          <video id="qrVid" playsinline autoplay muted></video>
+          <div class="qr-corner tl"></div><div class="qr-corner tr"></div>
+          <div class="qr-corner bl"></div><div class="qr-corner br"></div>
+          <div class="qr-scanline"></div>
+        </div>
+        <div class="qr-hint">Kamerayı QR koda doğrultun</div>
+        <button class="btn btn-secondary" style="width:auto;padding:8px 20px;font-size:13px" onclick="stopQR()">Kapat</button>
       </div>
     </div>
+
     <div class="card">
-      <div class="cl">Platform ve Alan Se&#231;</div>
+      <div class="card-label">Platform ve Alan Seç</div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
-        <select id="pSel" style="flex:1" onchange="chkM()"><option value="">Platform...</option></select>
-        <select id="aSel" style="flex:1" onchange="chkM()"><option value="">Alan...</option></select>
+        <select id="pSel" onchange="chkM()"><option value="">Platform seçin...</option></select>
+        <select id="aSel" onchange="chkBtn()"><option value="">Alan seçin...</option></select>
       </div>
-      <input type="text" id="qrM" placeholder="veya QR: P01-A01" oninput="this.value=this.value.toUpperCase();chkM()" style="margin-bottom:8px">
-      <button class="btn bp" id="mBtn" onclick="manuelGiris()" disabled>Devam et</button>
+      <input type="text" id="qrM" placeholder="veya QR kodu: P01-A01" oninput="this.value=this.value.toUpperCase();chkM()" style="margin-bottom:8px">
+      <button class="btn btn-primary" id="mBtn" onclick="manuelGiris()" disabled>Devam et</button>
     </div>
   </div>
 </div>
 
+<!-- S1b: DENETÇİ -->
 <div class="screen" id="s1b">
   <div class="topbar">
-    <button class="bk" onclick="stopQR();goScreen('s1')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="ti"><div class="tt" id="s1bT">Platform</div><div class="ts">Alan se&#231;in</div></div>
+    <button class="topbar-back" onclick="goScreen('s1')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="topbar-info">
+      <div class="topbar-title" id="s1bT">Platform</div>
+      <div class="topbar-sub">Denetçi bilgisi</div>
+    </div>
   </div>
   <div class="body">
-    <div class="card"><div class="cl">Denet&#231;i</div><input type="text" id="dAdi" placeholder="Ad&#305;n&#305;z&#305; girin..." oninput="chkB()"></div>
-    <div class="card"><div class="cl">Denetim Alan&#305;</div><div class="ag" id="aGrid"></div></div>
-    <button class="btn bp" id="bBtn" onclick="dBaslat()" disabled>Denetimi ba&#351;lat</button>
+    <div class="card">
+      <div class="card-label">Denetçi Adı Soyadı</div>
+      <input type="text" id="dAdi" placeholder="Adınızı ve soyadınızı girin..." oninput="chkB()">
+    </div>
+    <div class="card">
+      <div class="card-label">Denetim Alanı</div>
+      <div id="aGrid" class="alan-grid"></div>
+    </div>
+    <button class="btn btn-primary" id="bBtn" onclick="dBaslat()" disabled>Denetimi Başlat</button>
   </div>
 </div>
 
+<!-- S2: FORM -->
 <div class="screen" id="s2">
   <div class="topbar">
-    <button class="bk" onclick="if(confirm('&#199;&#305;kmak istiyor musunuz? Veriler kaybolacak.'))goScreen('s1')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="ti"><div class="tt" id="s2T">Denetim</div><div class="ts" id="s2S"></div></div>
-    <div class="tbadge" id="s2B">0/0</div>
+    <button class="topbar-back" onclick="cikConfirm()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="topbar-info">
+      <div class="topbar-title" id="s2T">Denetim</div>
+      <div class="topbar-sub" id="s2S"></div>
+    </div>
+    <div class="topbar-badge" id="s2B">0/0</div>
   </div>
-  <div class="body" id="fBody"></div>
+  <div class="body" id="formBody"></div>
 </div>
 
+<!-- S3: FOTO -->
 <div class="screen" id="s3">
   <div class="topbar">
-    <button class="bk" onclick="goScreen('s2')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="ti"><div class="tt">Uygunsuzluk foto&#287;raf&#305;</div><div class="ts" id="s3S"></div></div>
+    <button class="topbar-back" onclick="goScreen('s2')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="topbar-info">
+      <div class="topbar-title">Uygunsuzluk Fotoğrafı</div>
+      <div class="topbar-sub" id="s3S"></div>
+    </div>
   </div>
   <div class="body">
-    <div class="card" style="background:#FFF5F5;border-color:#FCA5A5"><div class="cl" style="color:var(--red)">Soru</div><div style="font-size:13px;color:var(--text);line-height:1.5" id="s3Q"></div></div>
-    <div class="card"><div class="cl">Not / A&#231;&#305;klama</div><textarea id="s3N" placeholder="Uygunsuzlu&#287;u k&#305;saca a&#231;&#305;klay&#305;n..." rows="3"></textarea></div>
+    <div class="card" style="background:var(--red-light);border-color:var(--red-mid)">
+      <div class="card-label" style="color:var(--red)">Uygunsuz Madde</div>
+      <div id="s3Q" style="font-size:13px;color:var(--text);line-height:1.55"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Not / Açıklama</div>
+      <textarea id="s3N" placeholder="Uygunsuzluğu kısaca açıklayın..." rows="3"></textarea>
+    </div>
     <div id="s3FA"></div>
     <input type="file" id="fK" accept="image/*" style="display:none" onchange="fSec(this)">
     <input type="file" id="fG" accept="image/*" style="display:none" onchange="fSec(this)">
-    <button class="btn bp" style="margin-top:4px" onclick="fKaydet()">Kaydet ve geri d&#246;n</button>
-    <button class="btn bs" onclick="goScreen('s2')" style="margin-top:-4px">Foto&#287;rafs&#305;z devam et</button>
+    <button class="btn btn-primary" onclick="fKaydet()">Kaydet ve Geri Dön</button>
+    <button class="btn btn-secondary" onclick="goScreen('s2')" style="margin-top:-2px">Fotoğrafsız Devam Et</button>
   </div>
 </div>
 
+<!-- S4: ÖZET -->
 <div class="screen" id="s4">
-  <div class="topbar"><div class="ti"><div class="tt">Denetim &#214;zeti</div><div class="ts" id="s4S"></div></div></div>
-  <div class="body">
-    <div class="sh" id="sH"><div class="sn2" id="sN">-</div><div class="sl2">Genel skor</div><div class="sbd" id="sBd"></div></div>
-    <div class="card"><div class="cl">Kategori Skorlar&#305;</div><div id="kRws"></div></div>
-    <div class="card" id="hCard" style="display:none"><div class="cl" style="color:var(--red)">Uygunsuzluklar</div><div id="hList"></div></div>
-    <div class="card">
-      <div class="cl">Denetim Bilgileri</div>
-      <div class="ir"><span class="ik">Alan</span><span class="iv" id="s4A"></span></div>
-      <div class="ir"><span class="ik">Platform</span><span class="iv" id="s4P"></span></div>
-      <div class="ir"><span class="ik">Denet&#231;i</span><span class="iv" id="s4D"></span></div>
-      <div class="ir"><span class="ik">Tarih</span><span class="iv" id="s4T"></span></div>
+  <div class="topbar">
+    <div class="arvato-logo"><span>arvato</span></div>
+    <div class="topbar-info">
+      <div class="topbar-title">Denetim Özeti</div>
+      <div class="topbar-sub" id="s4S"></div>
     </div>
-    <button class="btn bp" id="kBtn" onclick="spGonder()">SharePoint&#39;e Kaydet</button>
-    <button class="btn bs" style="margin-top:-4px" onclick="goScreen('s1')">Yeni Denetim</button>
+  </div>
+  <div class="body">
+    <div class="score-hero" id="sH">
+      <div class="score-num" id="sN">—</div>
+      <div class="score-label">Genel Uyum Skoru</div>
+      <div class="score-badges" id="sBd"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Kategori Skorları</div>
+      <div id="kRws"></div>
+    </div>
+    <div class="card" id="hCard" style="display:none">
+      <div class="card-label" style="color:var(--red)">Uygunsuzluklar</div>
+      <div id="hList"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Denetim Bilgileri</div>
+      <div class="info-row"><span class="info-key">Alan</span><span class="info-val" id="i-alan"></span></div>
+      <div class="info-row"><span class="info-key">Platform</span><span class="info-val" id="i-plat"></span></div>
+      <div class="info-row"><span class="info-key">Denetçi</span><span class="info-val" id="i-dnt"></span></div>
+      <div class="info-row"><span class="info-key">Tarih</span><span class="info-val" id="i-tarih"></span></div>
+    </div>
+    <button class="btn btn-success" id="kBtn" onclick="spGonder()">SharePoint'e Kaydet</button>
+    <button class="btn btn-secondary" onclick="yeniDenetim()" style="margin-top:-2px">Yeni Denetim</button>
   </div>
 </div>
+
 </div>
-<div class="toast" id="toast"></div>
+<div id="toast"></div>
 <script>
+
 const PA='https://default659c3a90ec904772b772cebe2050a8.2e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fef6810e4df745818f4cebd6990d5277/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bYG93e6RT0Cefm-XRexYS0gvP_XABb0pQH4cBHvNx90';
 const AL={"A01":"İade Alanı","A02":"Mal Kabul","A03":"MZ Raf Alanları","A04":"Akü-YK Raf Alanları","A05":"Sevkiyat","A06":"Rampa","A07":"MZ - Paketleme","A08":"YK - Paketleme"};
 const PL={"P01":"Platform L","P02":"Platform L2","P03":"Platform L3","P05":"Mercedes","P06":"Platform S2","P07":"Platform M3","P08":"Platform S","P09":"Platform X","P10":"Platform M","P11":"Platform C"};
 const SR=[{"id":"S001","alanID":"A01","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar (ürün, malzeme, ekipman, KKD vb.) tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S002","alanID":"A01","k":"1S","no":2,"s":"Raflara geri dönecek ürünler ile imhaya gidecek ürünler net şekilde ayrılmıştır."},{"id":"S003","alanID":"A01","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S004","alanID":"A01","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S006","alanID":"A01","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S007","alanID":"A01","k":"2S","no":7,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S008","alanID":"A01","k":"2S","no":8,"s":"İade kontrol ve ayrıştırma masaları düzenli ve erişilebilirdir."},{"id":"S009","alanID":"A01","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır (basınç barları yeşildedir)."},{"id":"S011","alanID":"A01","k":"3S","no":11,"s":"Alan ve zemin temizdir."},{"id":"S012","alanID":"A01","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S013","alanID":"A01","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S014","alanID":"A01","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S015","alanID":"A01","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S017","alanID":"A01","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S018","alanID":"A01","k":"4S","no":18,"s":"Alana ait standart yerleşim (layout) ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S019","alanID":"A01","k":"4S","no":19,"s":"Alanda 5S faaliyetleri için kullanılan form ve dokümanlar günceldir."},{"id":"S020","alanID":"A01","k":"4S","no":20,"s":"Çalışanlar zorunlu KKD'leri kullanmaktadır."},{"id":"S022","alanID":"A01","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S023","alanID":"A01","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S024","alanID":"A01","k":"5S","no":24,"s":"Bir önceki denetimde tespit edilen olumsuzluklar için aksiyon planları takip edilmektedir."},{"id":"S025","alanID":"A01","k":"5S","no":25,"s":"İyi uygulamalar ve başarılı ekipler, 5S panolarında paylaşılmakta ve takdir edilmektedir."},{"id":"S027","alanID":"A02","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S028","alanID":"A02","k":"1S","no":2,"s":"Hasarlı veya eksik gelen ürünler sağlam ürünlerden ayrılmıştır."},{"id":"S029","alanID":"A02","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S030","alanID":"A02","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S032","alanID":"A02","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S033","alanID":"A02","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S034","alanID":"A02","k":"2S","no":8,"s":"Alanda kullanılan malzemeler düzgün şekilde istiflenmiştir."},{"id":"S035","alanID":"A02","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S037","alanID":"A02","k":"3S","no":11,"s":"Alan ve zemin temizdir."},{"id":"S038","alanID":"A02","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S039","alanID":"A02","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S040","alanID":"A02","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S041","alanID":"A02","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S043","alanID":"A02","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S044","alanID":"A02","k":"4S","no":18,"s":"Alana ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S045","alanID":"A02","k":"4S","no":19,"s":"Alanda 5S faaliyetleri için kullanılan form ve dokümanlar günceldir."},{"id":"S048","alanID":"A02","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S049","alanID":"A02","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S050","alanID":"A02","k":"5S","no":24,"s":"Bir önceki denetimde tespit edilen olumsuzluklar için aksiyon planları takip edilmektedir."},{"id":"S051","alanID":"A02","k":"5S","no":25,"s":"İyi uygulamalar ve başarılı ekipler, 5S panolarında paylaşılmakta ve takdir edilmektedir."},{"id":"S053","alanID":"A03","k":"1S","no":1,"s":"Depolama alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S054","alanID":"A03","k":"1S","no":2,"s":"Hasarlı ürünler alandan ayrılmıştır."},{"id":"S055","alanID":"A03","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S056","alanID":"A03","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S058","alanID":"A03","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S059","alanID":"A03","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S060","alanID":"A03","k":"2S","no":8,"s":"Ürünler tanımlı lokasyonlarında ve belirlenen düzen içinde depolanmaktadır."},{"id":"S061","alanID":"A03","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S063","alanID":"A03","k":"3S","no":11,"s":"Raflar, zemin, çevre alanlar temizdir."},{"id":"S064","alanID":"A03","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S065","alanID":"A03","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S066","alanID":"A03","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S067","alanID":"A03","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S069","alanID":"A03","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S070","alanID":"A03","k":"4S","no":18,"s":"Alana ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S074","alanID":"A03","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S075","alanID":"A03","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S079","alanID":"A04","k":"1S","no":1,"s":"Depolama alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S080","alanID":"A04","k":"1S","no":2,"s":"Hasarlı ürünler alandan ayrılmıştır."},{"id":"S081","alanID":"A04","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S084","alanID":"A04","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S085","alanID":"A04","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S086","alanID":"A04","k":"2S","no":8,"s":"Ürünler tanımlı lokasyonlarında ve belirlenen düzen içinde depolanmaktadır."},{"id":"S089","alanID":"A04","k":"3S","no":11,"s":"Raflar, zemin, çevre alanlar temizdir."},{"id":"S090","alanID":"A04","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S091","alanID":"A04","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S092","alanID":"A04","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S105","alanID":"A05","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S106","alanID":"A05","k":"1S","no":2,"s":"Paletler tanımlı alanlarda istiflenmiştir, geçiş/yürüyüş yollarını engellememektedir."},{"id":"S107","alanID":"A05","k":"1S","no":3,"s":"Transpalet / forklift vb. ekipmanlar tanımlı park alanlarında konumlandırılmıştır."},{"id":"S108","alanID":"A05","k":"1S","no":4,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S113","alanID":"A05","k":"2S","no":8,"s":"Alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S114","alanID":"A05","k":"2S","no":9,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S115","alanID":"A05","k":"2S","no":10,"s":"Paletler istif yükseliğine uygun şekilde istiflenmiştir."},{"id":"S120","alanID":"A05","k":"3S","no":14,"s":"Zemin ve kullanılan ekipmanlar temizdir."},{"id":"S121","alanID":"A05","k":"3S","no":15,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S127","alanID":"A05","k":"4S","no":20,"s":"Rampa alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S128","alanID":"A05","k":"4S","no":21,"s":"Rampa alanına ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S133","alanID":"A05","k":"5S","no":25,"s":"Rampa alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S138","alanID":"A06","k":"1S","no":1,"s":"Rampa alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S139","alanID":"A06","k":"1S","no":2,"s":"Paletler tanımlı alanlarda istiflenmiştir, geçiş/yürüyüş yollarını engellememektedir."},{"id":"S140","alanID":"A06","k":"1S","no":3,"s":"Transpalet / forklift vb. ekipmanlar tanımlı park alanlarında konumlandırılmıştır."},{"id":"S145","alanID":"A06","k":"2S","no":8,"s":"Rampa alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S146","alanID":"A06","k":"2S","no":9,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S151","alanID":"A06","k":"3S","no":14,"s":"Rampa alanı, zemin ve kullanılan ekipmanlar temizdir. Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S152","alanID":"A06","k":"3S","no":15,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S153","alanID":"A06","k":"3S","no":16,"s":"Rampa kapıları çalışır ve bakımlı durumdadır, arızalı ekipman bulunmamaktadır."},{"id":"S154","alanID":"A06","k":"3S","no":17,"s":"Haşere kontrol istasyonları tesis edilen yerdedir."},{"id":"S157","alanID":"A06","k":"4S","no":20,"s":"Rampa alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S162","alanID":"A06","k":"5S","no":25,"s":"Rampa alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S167","alanID":"A07","k":"1S","no":1,"s":"Paketleme alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S168","alanID":"A07","k":"1S","no":2,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S169","alanID":"A07","k":"1S","no":3,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S172","alanID":"A07","k":"2S","no":5,"s":"Paketleme alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S173","alanID":"A07","k":"2S","no":6,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S174","alanID":"A07","k":"2S","no":7,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S178","alanID":"A07","k":"3S","no":10,"s":"Paketleme alanı, masalar ve kullanılan ekipmanlar temizdir."},{"id":"S179","alanID":"A07","k":"3S","no":11,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S180","alanID":"A07","k":"3S","no":12,"s":"Ekran/Mouse/Klavye mevcut ve çalışır durumdadır."},{"id":"S181","alanID":"A07","k":"3S","no":13,"s":"Scanner mevcut ve çalışır durumdadır."},{"id":"S182","alanID":"A07","k":"3S","no":14,"s":"Kargo etiketi yazıcısı mevcut ve çalışır durumdadır."},{"id":"S185","alanID":"A07","k":"4S","no":16,"s":"Paketleme alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S188","alanID":"A07","k":"4S","no":19,"s":"Paketleme alanında bulunan çalışanlar zorunlu KKD'leri kullanmaktadır."},{"id":"S191","alanID":"A07","k":"5S","no":21,"s":"Paketleme alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S192","alanID":"A07","k":"5S","no":22,"s":"Paketleme alanının güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S196","alanID":"A08","k":"1S","no":1,"s":"Paketleme alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S197","alanID":"A08","k":"1S","no":2,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S201","alanID":"A08","k":"2S","no":5,"s":"Paketleme alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S207","alanID":"A08","k":"3S","no":10,"s":"Paketleme alanı, masalar ve kullanılan ekipmanlar temizdir."},{"id":"S209","alanID":"A08","k":"3S","no":12,"s":"Ekran/Mouse/Klavye mevcut ve çalışır durumdadır."},{"id":"S210","alanID":"A08","k":"3S","no":13,"s":"Scanner mevcut ve çalışır durumdadır."},{"id":"S214","alanID":"A08","k":"4S","no":16,"s":"Paketleme alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S220","alanID":"A08","k":"5S","no":21,"s":"Paketleme alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."}];
 
-let st={pid:null,aid:null,dc:'',sr:[],cv:{},nt:{},ft:{},as:null};
+let st={pid:null,aid:null,dc:'',sr:[],cv:{},nt:{},ft:{},fb:{},as:null};
 let qrStr=null,qrAF=null;
 
 function triggerCamera(){
@@ -187,6 +338,10 @@ function init(){
   Object.entries(PL).forEach(([id,ad])=>{const o=document.createElement('option');o.value=id;o.textContent=ad+' ('+id+')';ps.appendChild(o);});
   const as=document.getElementById('aSel');
   Object.entries(AL).forEach(([id,ad])=>{const o=document.createElement('option');o.value=id;o.textContent=ad;as.appendChild(o);});
+}
+
+function onPSel(){
+  chkBtn();
 }
 
 function chkM(){
@@ -208,7 +363,11 @@ function manuelGiris(){
 }
 
 function goAlan(){
-  document.getElementById('s1bT').textContent=PL[st.pid];
+  const alanAdi = AL[st.aid] || st.aid;
+  const platAdi = PL[st.pid] || st.pid;
+  const infoEl = document.getElementById('secilenAlanInfo');
+  if(infoEl) infoEl.textContent = platAdi + ' — ' + alanAdi;
+  document.getElementById('s1bT').textContent=PL[st.pid]||st.pid;
   const g=document.getElementById('aGrid');g.innerHTML='';
   Object.entries(AL).forEach(([id,ad])=>{
     if(!SR.some(s=>s.alanID===id))return;
@@ -266,14 +425,14 @@ function stopQR(){
 function renderForm(){
   const kl=['1S','2S','3S','4S','5S'];
   const kn={'1S':'1S · Ayıkla','2S':'2S · Düzenle','3S':'3S · Temizle','4S':'4S · Standartlaştır','5S':'5S · Sürdür'};
-  const kc={'1S':'#378ADD','2S':'#1D9E75','3S':'#E85D24','4S':'#7F77DD','5S':'#D85A30'};
-  let h=`<div class="card" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text-soft)">Tamamlanan</span><span style="font-size:12px;font-weight:600;color:var(--blue);font-family:'DM Mono',monospace" id="pC">0 / ${st.sr.length}</span></div><div class="pb"><div class="pf" id="pF" style="width:0%"></div></div></div>`;
+  const kc={'1S':'#0078BE','2S':'#1A7A4A','3S':'#B91C1C','4S':'#6D28D9','5S':'#D97706'};
+  let h=`<div class="progress-card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text-soft)">Tamamlanan</span><span style="font-size:12px;font-weight:600;color:var(--blue);font-family:'DM Mono',monospace" id="pC">0 / ${st.sr.length}</span></div><div class="pb"><div class="pf" id="pF" style="width:0%"></div></div></div>`;
   kl.forEach(k=>{
     const ks=st.sr.filter(s=>s.k===k);if(!ks.length)return;
-    h+=`<div class="kh" style="background:${kc[k]}"><span>${kn[k]}</span><span id="ks-${k}" style="font-family:'DM Mono',monospace;font-size:12px;opacity:.85">—</span></div>`;
+    h+=`<div class="kh" style="background-image:${kc[k]}"><span>${kn[k]}</span><span id="ks-${k}" style="font-family:'DM Mono',monospace;font-size:12px;opacity:.85">—</span></div>`;
     ks.forEach(s=>{h+=`<div class="sc" id="sc-${s.id}"><div class="sm"><span class="sn">${s.id}</span><span class="kb">Kritik</span></div><div class="st">${s.s}</div><div class="cr"><button class="cb" id="ce-${s.id}" onclick="cv('${s.id}','Evet')">Evet</button><button class="cb" id="ch-${s.id}" onclick="cv('${s.id}','Hayır')">Hayır</button><button class="cb" id="cn-${s.id}" onclick="cv('${s.id}','NA')">N/A</button></div><div id="ex-${s.id}"></div></div>`;});
   });
-  h+=`<button class="btn bp" style="margin-top:4px" onclick="gOzet()">Denetimi tamamla</button>`;
+  h+=`<button class="btn btn-primary" style="margin-top:4px" onclick="gOzet()">Denetimi tamamla</button>`;
   document.getElementById('fBody').innerHTML=h;
 }
 
@@ -307,7 +466,19 @@ function acF(sid){
   goScreen('s3');
 }
 
-function fSec(inp){if(inp.files&&inp.files[0]){st.ft[st.as]=inp.files[0].name;showToast('Fotoğraf: '+inp.files[0].name);}}
+function fSec(inp){
+  if(inp.files&&inp.files[0]){
+    const file=inp.files[0];
+    st.ft[st.as]=file.name;
+    const reader=new FileReader();
+    reader.onload=function(e){
+      // Strip data:image/...;base64, prefix
+      st.fb[st.as]=e.target.result.split(',')[1];
+      showToast('Fotoğraf eklendi: '+file.name);
+    };
+    reader.readAsDataURL(file);
+  }
+}
 
 function fKaydet(){
   st.nt[st.as]=document.getElementById('s3N').value;
@@ -318,7 +489,7 @@ function fKaydet(){
 function updBadge(){
   const t=st.sr.length,d=Object.keys(st.cv).length;
   document.getElementById('s2B').textContent=d+'/'+t;
-  const pc=document.getElementById('pC'),pf=document.getElementById('pF');
+  const pc=document.document.querySelector('.progress-count'),pf=document.getElementById('pF');
   if(pc)pc.textContent=d+' / '+t;if(pf)pf.style.width=Math.round(d/t*100)+'%';
 }
 
@@ -340,7 +511,7 @@ function gOzet(){
 function renderOzet(){
   const kl=['1S','2S','3S','4S','5S'];
   const kn={'1S':'1S · Ayıkla','2S':'2S · Düzenle','3S':'3S · Temizle','4S':'4S · Standartlaştır','5S':'5S · Sürdür'};
-  const kc={'1S':'#378ADD','2S':'#1D9E75','3S':'#E85D24','4S':'#7F77DD','5S':'#D85A30'};
+  const kc={'1S':'#0078BE','2S':'#1A7A4A','3S':'#B91C1C','4S':'#6D28D9','5S':'#D97706'};
   let tE=0,tH=0,tN=0,tG=0,kh='';
   kl.forEach(k=>{
     const ks=st.sr.filter(s=>s.k===k);if(!ks.length)return;
@@ -352,8 +523,8 @@ function renderOzet(){
   });
   const g=tG>0?Math.round(tE/tG*100):0;
   document.getElementById('sN').textContent=g+'%';
-  document.getElementById('sH').style.background=g>=80?'#1D6A3A':g>=60?'#B45309':'#C0392B';
-  document.getElementById('sBd').innerHTML=`<span class="sbg">${tE} Evet</span><span class="sbg r">${tH} Hayır</span>${tN?`<span class="sbg">${tN} N/A</span>`:''}`;
+  document.getElementById('sH').style.background=g>=80?'#15803D':g>=60?'#B45309':'#B91C1C';
+  document.getElementById('sBd').innerHTML=`<span class="score-badge">${tE} Evet</span><span class="score-badge red">${tH} Hayır</span>${tN?`<span class="score-badge">${tN} N/A</span>`:''}`;
   document.getElementById('kRws').innerHTML=kh;
   const hy=st.sr.filter(s=>st.cv[s.id]==='Hayır');
   const hc=document.getElementById('hCard');
@@ -372,7 +543,7 @@ function mkData(){
   const kl=['1S','2S','3S','4S','5S'];let tE=0,tH=0,tN=0;
   kl.forEach(k=>{st.sr.filter(s=>s.k===k).forEach(s=>{if(st.cv[s.id]==='Evet')tE++;else if(st.cv[s.id]==='Hayır')tH++;else if(st.cv[s.id]==='NA')tN++;});});
   const gc=st.sr.length-tN;
-  return{denetimTarihi:new Date().toISOString(),platformID:st.pid,platform:PL[st.pid],alanID:st.aid,alan:AL[st.aid],denetci:st.dc,toplamSoru:st.sr.length,evetSayisi:tE,hayirSayisi:tH,naSayisi:tN,skorYuzde:gc>0?Math.round(tE/gc*100):0,detaylar:st.sr.map(s=>({soruID:s.id,kategori:s.k,soru:s.s,cevap:st.cv[s.id]||'Cevaplanmadı',not:st.nt[s.id]||'',fotograf:st.ft[s.id]||''}))};
+  return{denetimTarihi:new Date().toISOString(),platformID:st.pid,platform:PL[st.pid],alanID:st.aid,alan:AL[st.aid],denetci:st.dc,toplamSoru:st.sr.length,evetSayisi:tE,hayirSayisi:tH,naSayisi:tN,skorYuzde:gc>0?Math.round(tE/gc*100):0,detaylar:st.sr.map(s=>({soruID:s.id,kategori:s.k,soru:s.s,cevap:st.cv[s.id]||'Cevaplanmadı',not:st.nt[s.id]||'',fotograf:st.ft[s.id]||'',fotografBase64:st.fb[s.id]||''}))};
 }
 
 async function spGonder(){
@@ -396,6 +567,8 @@ async function spGonder(){
   }
 }
 
+function cikConfirm(){if(confirm('Denetimden çıkmak istediğinizden emin misiniz?'))goScreen('s1');}
+
 function goScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
@@ -404,13 +577,14 @@ init();
 document.getElementById('pSel').addEventListener('change', function(){
   const aid = document.getElementById('aSel').value;
   if(this.value && aid) document.getElementById('mBtn').disabled = false;
-  else chkM();
+  else chkBtn();
 });
 document.getElementById('aSel').addEventListener('change', function(){
   const pid = document.getElementById('pSel').value;
   if(pid && this.value) document.getElementById('mBtn').disabled = false;
-  else chkM();
+  else chkBtn();
 });
+
 </script>
 </body>
 </html>
