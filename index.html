@@ -282,7 +282,7 @@ select{-webkit-appearance:none;appearance:none;background-image:url("data:image/
   <div class="body">
     <div class="card">
       <div class="card-label">Denetçi Adı Soyadı</div>
-      <input type="text" id="dAdi" placeholder="Adınızı ve soyadınızı girin..." oninput="chkB()">
+      <input type="text" id="dAdi" readonly style="background:#EEF5FC;color:var(--arvato);font-weight:600;cursor:not-allowed;border-color:#C5DDF6">
     </div>
     <div class="card">
       <div class="card-label">Denetim Alanı</div>
@@ -389,7 +389,7 @@ function triggerCamera(){
 
 
 // AUTH
-const SIFRE_DEGISTIR_URL = ''; // Sonra eklenecek
+const SIFRE_DEGISTIR_URL = 'https://default659c3a90ec904772b772cebe2050a8.2e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/18564191b77647008a8f84fa113d2763/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=rmCEcttybFhgd_yzZMEH7xqF8BkXQl80oQqtLa9Ar-c'; // Sonra eklenecek
 
 function chkLogin(){
   const s=document.getElementById('loginSicil').value.trim();
@@ -524,7 +524,7 @@ function goAlan(){
   if(dEl&&usr.adSoyad){dEl.value=usr.adSoyad;chkB();}
 }
 
-function chkB(){document.getElementById('bBtn').disabled=!(st.aid&&document.getElementById('dAdi').value.trim());}
+function chkB(){document.getElementById('bBtn').disabled=!st.aid;}
 
 function dBaslat(){
   st.dc=document.getElementById('dAdi').value.trim()||usr.adSoyad;
