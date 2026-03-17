@@ -397,7 +397,7 @@ function chkLogin(){
   document.getElementById('loginBtn').disabled=!(s&&p);
 }
 
-async function girisYap(){
+async async function girisYap(){
   const sicil=document.getElementById('loginSicil').value.trim();
   const sifre=document.getElementById('loginSifre').value;
   const btn=document.getElementById('loginBtn');
@@ -415,7 +415,11 @@ async function girisYap(){
       usr.adSoyad=d.adSoyad;
       usr.platform=d.platform;
       usr.ilkGiris=d.ilkGiris;
-      if(d.ilkGiris===true||d.ilkGiris==='true'){
+      // IlkGiris: true, "true", 1, "1", "Evet" hepsini yakala
+      const ilk = d.ilkGiris;
+      const ilkGirisVar = (ilk===true||ilk==='true'||ilk===1||ilk==='1'||ilk==='Evet'||ilk==='evet');
+      console.log('ilkGiris raw:', ilk, '-> zorunlu:', ilkGirisVar);
+      if(ilkGirisVar){
         goScreen('s0b');
       } else {
         girişTamamla();
