@@ -192,7 +192,7 @@ select{-webkit-appearance:none;appearance:none;background-image:url("data:image/
   <div class="body" style="justify-content:center">
     <div class="card">
       <div class="card-label">Sicil No</div>
-      <input type="number" id="loginSicil" placeholder="Sicil numaranızı girin" style="margin-bottom:12px" oninput="chkLogin()">
+      <input type="text" id="loginSicil" inputmode="numeric" placeholder="Sicil numaranızı girin" style="margin-bottom:12px" oninput="chkLogin()">
       <div class="card-label">Şifre</div>
       <input type="password" id="loginSifre" placeholder="Şifrenizi girin" style="margin-bottom:16px" oninput="chkLogin()" onkeydown="if(event.key==='Enter')girisYap()">
       <button class="btn btn-primary" id="loginBtn" onclick="girisYap()" disabled>Giriş Yap</button>
@@ -393,8 +393,9 @@ const SIFRE_DEGISTIR_URL = 'https://default659c3a90ec904772b772cebe2050a8.2e.env
 
 function chkLogin(){
   const s=document.getElementById('loginSicil').value.trim();
-  const p=document.getElementById('loginSifre').value;
-  document.getElementById('loginBtn').disabled=!(s&&p);
+  const p=document.getElementById('loginSifre').value.trim();
+  const btn=document.getElementById('loginBtn');
+  btn.disabled=!(s.length>0&&p.length>0);
 }
 
 async async function girisYap(){
