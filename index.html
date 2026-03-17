@@ -178,8 +178,60 @@ select{-webkit-appearance:none;appearance:none;background-image:url("data:image/
 <body>
 <div class="app">
 
+<!-- S0: GİRİŞ -->
+<div class="screen active" id="s0">
+  <div style="background:var(--arvato);padding:40px 20px 32px;display:flex;flex-direction:column;align-items:center;gap:16px">
+    <div style="background:#fff;border-radius:10px;padding:8px 20px">
+      <span style="font-size:22px;font-weight:700;color:var(--arvato);letter-spacing:-.5px;font-family:'Inter',sans-serif">arvato</span>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:16px;font-weight:600;color:#fff">5S Denetim Sistemi</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:4px">Lean & Operasyon Standardizasyonu</div>
+    </div>
+  </div>
+  <div class="body" style="justify-content:center">
+    <div class="card">
+      <div class="card-label">Sicil No</div>
+      <input type="number" id="loginSicil" placeholder="Sicil numaranızı girin" style="margin-bottom:12px" oninput="chkLogin()">
+      <div class="card-label">Şifre</div>
+      <input type="password" id="loginSifre" placeholder="Şifrenizi girin" style="margin-bottom:16px" oninput="chkLogin()" onkeydown="if(event.key==='Enter')girisYap()">
+      <button class="btn btn-primary" id="loginBtn" onclick="girisYap()" disabled>Giriş Yap</button>
+      <div id="loginHata" style="font-size:12px;color:var(--red);text-align:center;margin-top:8px;min-height:18px"></div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--text-soft);padding:8px">
+      Şifrenizi unuttuysanız yöneticinizle iletişime geçin.
+    </div>
+  </div>
+</div>
+
+<!-- S0b: ŞİFRE DEĞİŞTİR -->
+<div class="screen" id="s0b">
+  <div class="topbar">
+    <div class="arvato-logo"><span>arvato</span></div>
+    <div class="topbar-info">
+      <div class="topbar-title">Şifre Oluştur</div>
+      <div class="topbar-sub">İlk girişiniz — yeni şifre belirleyin</div>
+    </div>
+  </div>
+  <div class="body" style="justify-content:center">
+    <div class="card" style="background:var(--amber-light);border-color:#FDE68A">
+      <div style="font-size:12px;color:var(--amber);line-height:1.6">
+        İlk girişiniz! Güvenliğiniz için yeni bir şifre belirlemeniz gerekmektedir.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Yeni Şifre</div>
+      <input type="password" id="yeniSifre1" placeholder="En az 6 karakter" style="margin-bottom:12px" oninput="chkSifre()">
+      <div class="card-label">Yeni Şifre (tekrar)</div>
+      <input type="password" id="yeniSifre2" placeholder="Şifrenizi tekrar girin" style="margin-bottom:16px" oninput="chkSifre()">
+      <button class="btn btn-primary" id="sifreBtn" onclick="sifreDegistir()" disabled>Şifremi Kaydet</button>
+      <div id="sifreHata" style="font-size:12px;color:var(--red);text-align:center;margin-top:8px;min-height:18px"></div>
+    </div>
+  </div>
+</div>
+
 <!-- S1: GİRİŞ -->
-<div class="screen active" id="s1">
+<div class="screen" id="s1">
   <div class="splash">
     <div class="splash-logo"><span>arvato</span></div>
     <div class="splash-title">5S Denetim Sistemi</div>
@@ -318,12 +370,14 @@ select{-webkit-appearance:none;appearance:none;background-image:url("data:image/
 <div id="toast"></div>
 <script>
 
+const AUTH_URL='https://default659c3a90ec904772b772cebe2050a8.2e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/f4fb8b83ebf94ac592daedf26043e889/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=q2N33AVJIa-BWbP3Z9-2M8-15-QkJWf5otVg_S8myO4';
 const PA='https://default659c3a90ec904772b772cebe2050a8.2e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fef6810e4df745818f4cebd6990d5277/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bYG93e6RT0Cefm-XRexYS0gvP_XABb0pQH4cBHvNx90';
 const AL={"A01":"Mal Kabul","A02":"MZ - Paketleme","A03":"YK - Paketleme","A04":"MZ Raf Alanları","A05":"Akü-YK Raf Alanları","A06":"İade Alanı","A07":"Sevkiyat","A08":"Rampa"};
 const PL={"P01":"Mercedes","P02":"Platform C","P04":"Platform L","P05":"Platform L2","P06":"Platform L3","P08":"Platform M","P09":"Platform M3","P10":"Platform S","P11":"Platform S2","P12":"Platform X"};
 const SR=[{"id":"S001","alanID":"A06","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar (ürün, malzeme, ekipman, KKD vb.) tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S002","alanID":"A06","k":"1S","no":2,"s":"Raflara geri dönecek ürünler ile imhaya gidecek ürünler net şekilde ayrılmıştır."},{"id":"S003","alanID":"A06","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S004","alanID":"A06","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S006","alanID":"A06","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S007","alanID":"A06","k":"2S","no":7,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S008","alanID":"A06","k":"2S","no":8,"s":"İade kontrol ve ayrıştırma masaları düzenli ve erişilebilirdir."},{"id":"S009","alanID":"A06","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır (basınç barları yeşildedir)."},{"id":"S011","alanID":"A06","k":"3S","no":11,"s":"Alan ve zemin temizdir."},{"id":"S012","alanID":"A06","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S013","alanID":"A06","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S014","alanID":"A06","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S015","alanID":"A06","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S017","alanID":"A06","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S018","alanID":"A06","k":"4S","no":18,"s":"Alana ait standart yerleşim (layout) ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S019","alanID":"A06","k":"4S","no":19,"s":"Alanda 5S faaliyetleri için kullanılan form ve dokümanlar günceldir."},{"id":"S020","alanID":"A06","k":"4S","no":20,"s":"Çalışanlar zorunlu KKD'leri kullanmaktadır."},{"id":"S022","alanID":"A06","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S023","alanID":"A06","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S024","alanID":"A06","k":"5S","no":24,"s":"Bir önceki denetimde tespit edilen olumsuzluklar için aksiyon planları takip edilmektedir."},{"id":"S025","alanID":"A06","k":"5S","no":25,"s":"İyi uygulamalar ve başarılı ekipler, 5S panolarında paylaşılmakta ve takdir edilmektedir."},{"id":"S027","alanID":"A01","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S028","alanID":"A01","k":"1S","no":2,"s":"Hasarlı veya eksik gelen ürünler sağlam ürünlerden ayrılmıştır."},{"id":"S029","alanID":"A01","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S030","alanID":"A01","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S032","alanID":"A01","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S033","alanID":"A01","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S034","alanID":"A01","k":"2S","no":8,"s":"Alanda kullanılan malzemeler düzgün şekilde istiflenmiştir."},{"id":"S035","alanID":"A01","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S037","alanID":"A01","k":"3S","no":11,"s":"Alan ve zemin temizdir."},{"id":"S038","alanID":"A01","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S039","alanID":"A01","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S040","alanID":"A01","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S041","alanID":"A01","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S043","alanID":"A01","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S044","alanID":"A01","k":"4S","no":18,"s":"Alana ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S045","alanID":"A01","k":"4S","no":19,"s":"Alanda 5S faaliyetleri için kullanılan form ve dokümanlar günceldir."},{"id":"S048","alanID":"A01","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S049","alanID":"A01","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S050","alanID":"A01","k":"5S","no":24,"s":"Bir önceki denetimde tespit edilen olumsuzluklar için aksiyon planları takip edilmektedir."},{"id":"S051","alanID":"A01","k":"5S","no":25,"s":"İyi uygulamalar ve başarılı ekipler, 5S panolarında paylaşılmakta ve takdir edilmektedir."},{"id":"S053","alanID":"A04","k":"1S","no":1,"s":"Depolama alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S054","alanID":"A04","k":"1S","no":2,"s":"Hasarlı ürünler alandan ayrılmıştır."},{"id":"S055","alanID":"A04","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S056","alanID":"A04","k":"1S","no":4,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S058","alanID":"A04","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S059","alanID":"A04","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S060","alanID":"A04","k":"2S","no":8,"s":"Ürünler tanımlı lokasyonlarında ve belirlenen düzen içinde depolanmaktadır."},{"id":"S061","alanID":"A04","k":"2S","no":9,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S063","alanID":"A04","k":"3S","no":11,"s":"Raflar, zemin, çevre alanlar temizdir."},{"id":"S064","alanID":"A04","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S065","alanID":"A04","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S066","alanID":"A04","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S067","alanID":"A04","k":"3S","no":15,"s":"Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S069","alanID":"A04","k":"4S","no":17,"s":"Alanda görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S070","alanID":"A04","k":"4S","no":18,"s":"Alana ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S074","alanID":"A04","k":"5S","no":22,"s":"Alanda 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S075","alanID":"A04","k":"5S","no":23,"s":"Alanın güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S079","alanID":"A05","k":"1S","no":1,"s":"Depolama alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S080","alanID":"A05","k":"1S","no":2,"s":"Hasarlı ürünler alandan ayrılmıştır."},{"id":"S081","alanID":"A05","k":"1S","no":3,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S084","alanID":"A05","k":"2S","no":6,"s":"Alanda kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S085","alanID":"A05","k":"2S","no":7,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S086","alanID":"A05","k":"2S","no":8,"s":"Ürünler tanımlı lokasyonlarında ve belirlenen düzen içinde depolanmaktadır."},{"id":"S089","alanID":"A05","k":"3S","no":11,"s":"Raflar, zemin, çevre alanlar temizdir."},{"id":"S090","alanID":"A05","k":"3S","no":12,"s":"Alanda kullanılan ekipmanlar temiz ve çalışılabilir durumdadır."},{"id":"S091","alanID":"A05","k":"3S","no":13,"s":"Alanda hasarlı ekipman bulunmamaktadır."},{"id":"S092","alanID":"A05","k":"3S","no":14,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S105","alanID":"A07","k":"1S","no":1,"s":"Alanda operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S106","alanID":"A07","k":"1S","no":2,"s":"Paletler tanımlı alanlarda istiflenmiştir, geçiş/yürüyüş yollarını engellememektedir."},{"id":"S107","alanID":"A07","k":"1S","no":3,"s":"Transpalet / forklift vb. ekipmanlar tanımlı park alanlarında konumlandırılmıştır."},{"id":"S108","alanID":"A07","k":"1S","no":4,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S113","alanID":"A07","k":"2S","no":8,"s":"Alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S114","alanID":"A07","k":"2S","no":9,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S115","alanID":"A07","k":"2S","no":10,"s":"Paletler istif yükseliğine uygun şekilde istiflenmiştir."},{"id":"S120","alanID":"A07","k":"3S","no":14,"s":"Zemin ve kullanılan ekipmanlar temizdir."},{"id":"S121","alanID":"A07","k":"3S","no":15,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S127","alanID":"A07","k":"4S","no":20,"s":"Rampa alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S128","alanID":"A07","k":"4S","no":21,"s":"Rampa alanına ait standart yerleşim ve/veya görsel standartlar alanda paylaşılmıştır."},{"id":"S133","alanID":"A07","k":"5S","no":25,"s":"Rampa alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S138","alanID":"A08","k":"1S","no":1,"s":"Rampa alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S139","alanID":"A08","k":"1S","no":2,"s":"Paletler tanımlı alanlarda istiflenmiştir, geçiş/yürüyüş yollarını engellememektedir."},{"id":"S140","alanID":"A08","k":"1S","no":3,"s":"Transpalet / forklift vb. ekipmanlar tanımlı park alanlarında konumlandırılmıştır."},{"id":"S145","alanID":"A08","k":"2S","no":8,"s":"Rampa alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S146","alanID":"A08","k":"2S","no":9,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S151","alanID":"A08","k":"3S","no":14,"s":"Rampa alanı, zemin ve kullanılan ekipmanlar temizdir. Temizlik faaliyetleri düzenli sürdürülmektedir."},{"id":"S152","alanID":"A08","k":"3S","no":15,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S153","alanID":"A08","k":"3S","no":16,"s":"Rampa kapıları çalışır ve bakımlı durumdadır, arızalı ekipman bulunmamaktadır."},{"id":"S154","alanID":"A08","k":"3S","no":17,"s":"Haşere kontrol istasyonları tesis edilen yerdedir."},{"id":"S157","alanID":"A08","k":"4S","no":20,"s":"Rampa alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S162","alanID":"A08","k":"5S","no":25,"s":"Rampa alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S167","alanID":"A02","k":"1S","no":1,"s":"Paketleme alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S168","alanID":"A02","k":"1S","no":2,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S169","alanID":"A02","k":"1S","no":3,"s":"Alanda tanımsız veya gereksiz eşyalar varsa, kırmızı etiket ile etiketlenmiştir."},{"id":"S172","alanID":"A02","k":"2S","no":5,"s":"Paketleme alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S173","alanID":"A02","k":"2S","no":6,"s":"Alandaki tabela, işaretleme, etiketleme ve yer çizgileri görünür ve anlaşılır durumdadır."},{"id":"S174","alanID":"A02","k":"2S","no":7,"s":"Yangın tüpleri tanımlı alanlarında ve kullanılabilir durumdadır."},{"id":"S178","alanID":"A02","k":"3S","no":10,"s":"Paketleme alanı, masalar ve kullanılan ekipmanlar temizdir."},{"id":"S179","alanID":"A02","k":"3S","no":11,"s":"Alan atık ve çöplerden arındırılmıştır."},{"id":"S180","alanID":"A02","k":"3S","no":12,"s":"Ekran/Mouse/Klavye mevcut ve çalışır durumdadır."},{"id":"S181","alanID":"A02","k":"3S","no":13,"s":"Scanner mevcut ve çalışır durumdadır."},{"id":"S182","alanID":"A02","k":"3S","no":14,"s":"Kargo etiketi yazıcısı mevcut ve çalışır durumdadır."},{"id":"S185","alanID":"A02","k":"4S","no":16,"s":"Paketleme alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S188","alanID":"A02","k":"4S","no":19,"s":"Paketleme alanında bulunan çalışanlar zorunlu KKD'leri kullanmaktadır."},{"id":"S191","alanID":"A02","k":"5S","no":21,"s":"Paketleme alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."},{"id":"S192","alanID":"A02","k":"5S","no":22,"s":"Paketleme alanının güncel 5S denetim sonuçları alanda bulunan 5S panosunda paylaşılmıştır."},{"id":"S196","alanID":"A03","k":"1S","no":1,"s":"Paketleme alanında operasyonu yürütmek için gerekli tüm eşyalar tanımlanmıştır ve tanım dışı eşya yoktur."},{"id":"S197","alanID":"A03","k":"1S","no":2,"s":"Alanda acil durum ekipmanları ve kaçış yollarını engelleyecek eşya bulunmamaktadır."},{"id":"S201","alanID":"A03","k":"2S","no":5,"s":"Paketleme alanında kullanılan tüm eşyalar için alan tanımlamaları yapılmıştır."},{"id":"S207","alanID":"A03","k":"3S","no":10,"s":"Paketleme alanı, masalar ve kullanılan ekipmanlar temizdir."},{"id":"S209","alanID":"A03","k":"3S","no":12,"s":"Ekran/Mouse/Klavye mevcut ve çalışır durumdadır."},{"id":"S210","alanID":"A03","k":"3S","no":13,"s":"Scanner mevcut ve çalışır durumdadır."},{"id":"S214","alanID":"A03","k":"4S","no":16,"s":"Paketleme alanında görev yapan çalışanlar 5S prensipleri konusunda bilgilendirilmiştir."},{"id":"S220","alanID":"A03","k":"5S","no":21,"s":"Paketleme alanında 5S denetimleri en az vardiyada bir kez yapılmaktadır."}];
 
 let st={pid:null,aid:null,dc:'',sr:[],cv:{},nt:{},ft:{},fb:{},as:null};
+let usr={sicilNo:'',adSoyad:'',platform:'',ilkGiris:false};
 let qrStr=null,qrAF=null;
 
 function triggerCamera(){
@@ -331,6 +385,93 @@ function triggerCamera(){
   fk.removeAttribute('capture');
   fk.setAttribute('capture','environment');
   fk.click();
+}
+
+
+// AUTH
+const SIFRE_DEGISTIR_URL = ''; // Sonra eklenecek
+
+function chkLogin(){
+  const s=document.getElementById('loginSicil').value.trim();
+  const p=document.getElementById('loginSifre').value;
+  document.getElementById('loginBtn').disabled=!(s&&p);
+}
+
+async function girisYap(){
+  const sicil=document.getElementById('loginSicil').value.trim();
+  const sifre=document.getElementById('loginSifre').value;
+  const btn=document.getElementById('loginBtn');
+  const hata=document.getElementById('loginHata');
+  btn.textContent='Giriş yapılıyor...';btn.disabled=true;hata.textContent='';
+  try{
+    const r=await fetch(AUTH_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sicilNo:sicil,sifre:sifre})
+    });
+    const d=await r.json();
+    if(d.basarili){
+      usr.sicilNo=sicil;
+      usr.adSoyad=d.adSoyad;
+      usr.platform=d.platform;
+      usr.ilkGiris=d.ilkGiris;
+      if(d.ilkGiris===true||d.ilkGiris==='true'){
+        goScreen('s0b');
+      } else {
+        girişTamamla();
+      }
+    } else {
+      hata.textContent=d.hata==='Sifre hatali'?'Şifre hatalı!':'Kullanıcı bulunamadı!';
+      btn.textContent='Giriş Yap';btn.disabled=false;
+    }
+  }catch(e){
+    hata.textContent='Bağlantı hatası, lütfen tekrar deneyin.';
+    btn.textContent='Giriş Yap';btn.disabled=false;
+  }
+}
+
+function girişTamamla(){
+  // Platform listesini yetkiye göre filtrele
+  const pSel=document.getElementById('pSel');
+  pSel.innerHTML='<option value="">Platform seçin...</option>';
+  Object.entries(PL).forEach(([id,ad])=>{
+    if(usr.platform==='All'||usr.platform==='ALL'||usr.platform.includes(id)){
+      const o=document.createElement('option');
+      o.value=id;o.textContent=ad+' ('+id+')';
+      pSel.appendChild(o);
+    }
+  });
+  goScreen('s1');
+}
+
+function chkSifre(){
+  const s1=document.getElementById('yeniSifre1').value;
+  const s2=document.getElementById('yeniSifre2').value;
+  const btn=document.getElementById('sifreBtn');
+  const hata=document.getElementById('sifreHata');
+  if(s1.length>0&&s1.length<6){hata.textContent='Şifre en az 6 karakter olmalı';btn.disabled=true;return;}
+  if(s1&&s2&&s1!==s2){hata.textContent='Şifreler eşleşmiyor';btn.disabled=true;return;}
+  hata.textContent='';
+  btn.disabled=!(s1.length>=6&&s1===s2);
+}
+
+async function sifreDegistir(){
+  const yeni=document.getElementById('yeniSifre1').value;
+  const btn=document.getElementById('sifreBtn');
+  const hata=document.getElementById('sifreHata');
+  btn.textContent='Kaydediliyor...';btn.disabled=true;
+  
+  if(SIFRE_DEGISTIR_URL){
+    try{
+      await fetch(SIFRE_DEGISTIR_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({sicilNo:usr.sicilNo,yeniSifre:yeni})
+      });
+    }catch(e){}
+  }
+  showToast('Şifreniz kaydedildi!');
+  girişTamamla();
 }
 
 function init(){
@@ -378,12 +519,15 @@ function goAlan(){
     g.appendChild(b);
   });
   goScreen('s1b');
+  // Denetçi adını otomatik doldur
+  const dEl=document.getElementById('dAdi');
+  if(dEl&&usr.adSoyad){dEl.value=usr.adSoyad;chkB();}
 }
 
 function chkB(){document.getElementById('bBtn').disabled=!(st.aid&&document.getElementById('dAdi').value.trim());}
 
 function dBaslat(){
-  st.dc=document.getElementById('dAdi').value.trim();
+  st.dc=document.getElementById('dAdi').value.trim()||usr.adSoyad;
   st.sr=SR.filter(s=>s.alanID===st.aid);
   st.cv={};st.nt={};st.ft={};st.fb={};
   renderForm();
