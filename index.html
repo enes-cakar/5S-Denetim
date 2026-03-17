@@ -418,7 +418,7 @@ async function girisYap(){
       usr.ilkGiris=d.ilkGiris;
       // IlkGiris: true, "true", 1, "1", "Evet" hepsini yakala
       const ilk = d.ilkGiris;
-      const ilkGirisVar = (ilk===true||ilk==='true'||ilk===1||ilk==='1'||ilk==='Evet'||ilk==='evet');
+      const ilkGirisVar = (ilk===true||ilk==='true'||ilk==='True'||ilk===1||ilk==='1'||ilk==='Evet'||ilk==='evet');
       console.log('ilkGiris raw:', ilk, '-> zorunlu:', ilkGirisVar);
       if(ilkGirisVar){
         goScreen('s0b');
